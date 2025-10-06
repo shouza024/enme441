@@ -1,6 +1,6 @@
 import time
 import RPi.GPIO as GPIO #importing gpio library
-import math
+import math as m
 
 GPIO.setmode(GPIO.BCM)
 
@@ -14,7 +14,7 @@ for pin in pins:
 
 pwm = GPIO.PWM(pins[0],pwm_frequency)
 try:
-    duty_cycle = ((sin(2*pi()*base_frequency*time.time()))**2)*100
+    duty_cycle = ((m.sin(2*pi()*base_frequency*time.time()))**2)*100
     pwm.start(duty_cycle)
     while True:
         pass
@@ -24,6 +24,7 @@ except KeyboardInterrupt:
 pwm.stop()
 pwm.cleanup()
    
+
 
 
 
