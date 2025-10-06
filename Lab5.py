@@ -12,7 +12,7 @@ for pin in pins:
     GPIO.setup(pin, GPIO.OUT)
     print(f'Pin{pin} setup for ouput')
 
-pwm = GPIO.PWM(pins,pwm_frequency)
+pwm = GPIO.PWM(pins[0],pwm_frequency)
 try:
     duty_cycle = ((sin(2*pi()*base_frequency*time.time()))**2)*100
     pwm.start(duty_cycle)
@@ -24,5 +24,6 @@ except KeyboardInterrupt:
 pwm.stop()
 pwm.cleanup()
    
+
 
 
