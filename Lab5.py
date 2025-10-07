@@ -12,6 +12,7 @@ direction = 1
 def button_call(button):
     global direction 
     direction = direction*-1  #Swap wave direction
+    print("Button Pressed")
 
 GPIO.add_event_detect(button,GPIO.RISING,callback=button_call,bouncetime=100)
 
@@ -44,6 +45,7 @@ for p in pwm:
     p.stop()
 GPIO.cleanup()
    
+
 
 
 
