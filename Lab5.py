@@ -4,7 +4,7 @@ import math as m
 
 GPIO.setmode(GPIO.BCM)
 
-pins = [21,20,16,12,7,26,19,13,6,5] #insert pin numbers once assigned.
+pins = [21,20,16,12,7,5,6,13,19,26] #insert pin numbers once assigned.
 base_frequency = 0.2 # frequency in hz
 pwm_frequency = 500 #hz
 pwm = []            #Creating a list
@@ -30,6 +30,7 @@ for p in pwm:
     p.stop()
 GPIO.cleanup()
    
+
 
 
 
