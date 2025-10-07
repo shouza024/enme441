@@ -10,9 +10,9 @@ GPIO.setup(button,GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 direction = 1
 
 def button_call(button):
-    direction = direction*-1  #Swap wave direction
+    global direction = direction*-1  #Swap wave direction
 
-GPIO.add_event_detect(buton,GPIO.RISING,callback=button_call,bouncetime=100)
+GPIO.add_event_detect(button,GPIO.RISING,callback=button_call,bouncetime=100)
 
 #LED initation
 pins = [21,20,16,12,7,5,6,13,19,26] #insert pin numbers once assigned.
@@ -31,7 +31,7 @@ for i,pin in enumerate(pins):
 #LED- changing brightness
 try:
     while 1:
-        for j,p in enumerate(pwm):
+        for j,p in enumerate(pwm[::direction]):
             t = time.time()
             duty_cycle = ((m.sin(2*m.pi*base_frequency*t - j*m.pi/11))**2)*100
             p.ChangeDutyCycle(duty_cycle)
@@ -43,6 +43,7 @@ for p in pwm:
     p.stop()
 GPIO.cleanup()
    
+
 
 
 
