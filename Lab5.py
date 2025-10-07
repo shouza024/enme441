@@ -10,7 +10,8 @@ GPIO.setup(button,GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 direction = 1
 
 def button_call(button):
-    global direction = direction*-1  #Swap wave direction
+    global direction 
+    direction = direction*-1  #Swap wave direction
 
 GPIO.add_event_detect(button,GPIO.RISING,callback=button_call,bouncetime=100)
 
@@ -43,6 +44,7 @@ for p in pwm:
     p.stop()
 GPIO.cleanup()
    
+
 
 
 
