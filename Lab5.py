@@ -4,28 +4,33 @@ import math as m
 
 GPIO.setmode(GPIO.BCM)
 
-pins = [21] #insert pin numbers once assigned.
+pins = [21,20,16,12,7,26,19,13,6,5] #insert pin numbers once assigned.
 base_frequency = 0.2 # frequency in hz
 pwm_frequency = 500 #hz
+pwm = []            #Creating a list
 
-for pin in pins:
+for i,pin in enumerate(pins):
     GPIO.setup(pin, GPIO.OUT)
     print(f'Pin{pin} setup for ouput')
-
-pwm = GPIO.PWM(pins[0],pwm_frequency)\
-
+    p = GPIO.PWM(pin,pwm_frequency)
+    p.start(((m.sin(-i*m.pi/11))**2)*100)
+    pwm.append(p)
+    
 try:
-    pwm.start(0)
     while 1:
-        duty_cycle = ((m.sin(2*m.pi*base_frequency*time.time()))**2)*100
-        pwm.ChangeDutyCycle(duty_cycle)
+        for j,p in enumerate(pwm):
+            t = time.time()
+            duty_cycle = ((m.sin(2*m.pi*base_frequency*t - j*m.pi/11))**2)*100
+            p.ChangeDutyCycle(duty_cycle)
         pass
 except KeyboardInterrupt:
     print('\nExiting')
 
-pwm.stop()
-pwm.cleanup()
+for p in pwm:
+    p.stop()
+GPIO.cleanup()
    
+
 
 
 
