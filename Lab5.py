@@ -14,7 +14,7 @@ def button_call(button):
     direction = direction*-1  #Swap wave direction
     print("Button Pressed")
 
-GPIO.add_event_detect(button,GPIO.RISING,callback=button_call,bouncetime=100)
+GPIO.add_event_detect(button,GPIO.RISING,callback=button_call,bouncetime=1000)
 
 #LED initation
 pins = [21,20,16,12,7,5,6,13,19,26] #insert pin numbers once assigned.
@@ -45,6 +45,7 @@ for p in pwm:
     p.stop()
 GPIO.cleanup()
    
+
 
 
 
