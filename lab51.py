@@ -28,8 +28,7 @@ for p in pins:
     led.append(pwm)
 
 
-
- GPIO.add_event_detect(button_pin, GPIO.RISING,  callback=button_pressed_callback, bouncetime=200)
+GPIO.add_event_detect(button_pin, GPIO.RISING,  callback=button_pressed_callback, bouncetime=200)
 
 try:
     while True:
