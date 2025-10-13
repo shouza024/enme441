@@ -27,7 +27,9 @@ GPIO.setmode(GPIO.BCM)
 
 dataPin, latchPin, clockPin = 23, 24, 25
 x = Shifter(dataPin,latchPin,clockPin)
-x.start
+GPIO.setup(serial_pin, GPIO.OUT)
+GPIO.setup(latch_pin, GPIO.OUT, initial=0)  
+GPIO.setup(clock_pin, GPIO.OUT, initial=0)
 
 pattern = 0b01100110        # 8-bit pattern to display on LED bar
 
