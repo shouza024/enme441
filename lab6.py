@@ -34,7 +34,7 @@ try:
       elif pos == 0:
           new_pos =1
       else:
-      new_pos = pos + random.choice([-1,1])
+          new_pos = pos + random.choice([-1,1])
                                   
   update(new_pos)
   time.sleep(0.05)
