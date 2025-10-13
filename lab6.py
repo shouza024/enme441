@@ -30,7 +30,10 @@ class Bug:
                new_pos =1
        else:
            new_pos = pos + random.choice([-1,1])
-                                  
+           if new_pos == 8:
+               new_pos = 1
+           elif new_pos ==0:
+               new_pos  = 7
        self.update(new_pos)
        time.sleep(self.timestep)
 
