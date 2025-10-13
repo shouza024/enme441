@@ -21,8 +21,8 @@ class Shifter:
     def shift_byte(self,b): 
         for i in range(8):
             GPIO.output(dataPin, b & (1<<i))
-            ping(clockPin) 
-        ping(latchPin) 
+            self.ping(clockPin) 
+        self.ping(latchPin) 
 
 GPIO.setmode(GPIO.BCM)
 
