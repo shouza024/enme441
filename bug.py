@@ -9,7 +9,7 @@ GPIO.setmode(GPIO.BCM)
 
 dataPin, latchPin, clockPin = 23, 24, 25
 y = shifter.shifter(dataPin,latchPin,clockPin)
-bug = Bug(y,0.05,1,True)
+bug = Bug.Bug(y,0.05,1,True)
 
 try:                             
   bug.start()
