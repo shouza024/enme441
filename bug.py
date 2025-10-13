@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 import shifter
 import random
-import bug1 as Bug
+import bugi as Bug
           
 
 GPIO.setmode(GPIO.BCM)
