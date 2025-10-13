@@ -20,7 +20,7 @@ class Bug:
 
    def run(self):
        self.shifter.shift_byte(self.pattern)
-       pos = self.x(self.pattern)
+       pos = self.x()
        if pos == 7:
            new_pos = 6
        elif pos == 0:
