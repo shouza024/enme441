@@ -9,6 +9,7 @@ class Bug:
        self.shifter = shifter
        self.x = x
        self.timestep = timestep
+       self.isWrapon = isWrapon
        self.pattern = (1 << self.x)
       
    def finder(self):
