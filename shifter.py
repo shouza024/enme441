@@ -21,5 +21,5 @@ class shifter:
     def shift_byte(self,b): 
         for i in range(8):
             GPIO.output(self.serial, b & (1<<i))
-            self.__ping(serial.clock) 
-        self.__ping(serial.latch) 
+            self.__ping(self.clock) 
+        self.__ping(self.latch) 
