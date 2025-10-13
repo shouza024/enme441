@@ -37,6 +37,7 @@ try:
           new_pos = pos + random.choice([-1,1])
                                   
   update(new_pos)
+  print(new_pos)
   time.sleep(0.05)
        
 except KeyboardInterrupt:
