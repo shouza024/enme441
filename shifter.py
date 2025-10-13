@@ -1,4 +1,4 @@
-import RPi.GPIO as GPIO
+aimport RPi.GPIO as GPIO
 import time
 
 class shifter:
@@ -20,6 +20,6 @@ class shifter:
       
     def shift_byte(self,b): 
         for i in range(8):
-            GPIO.output(self.serial, b & (1<<i))
-            self.__ping(self.clock) 
-        self.__ping(self.latch) 
+            GPIO.output(serial_pin, b & (1<<i))
+            self.__ping(clock_pin) 
+        self.__ping(latch_pin) 
