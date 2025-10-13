@@ -6,7 +6,7 @@ import random
 GPIO.setmode(GPIO.BCM)
 
 dataPin, latchPin, clockPin = 23, 24, 25
-y = shifter(dataPin,latchPin,clockPin)
+y = shifter.shifter(dataPin,latchPin,clockPin)
 
 pattern = 0b01111110        # 8-bit pattern to display on LED bar
 
@@ -26,13 +26,13 @@ def update(new_pos):
     
 try:  
   y.shift_byte(pattern)
-  x(pattern)
-  if x == 7:
+  pos = x(pattern)
+  if pos == 7:
       new_pos = 6
-  elif x == 0:
+  elif pos == 0:
       new_pos =1
   else:
-      new_pos = x + random.choice([-1,1])
+      new_pos = pos + random.choice([-1,1])
                                   
   update(new_pos)
   time.sleep(0.05)
