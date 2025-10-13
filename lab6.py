@@ -10,7 +10,7 @@ class Bug:
        self.x = x
        self.pattern = (1 << self.x)
       
-   def x(self):
+   def finder(self):
        for pos in range(8):
            if self.pattern & (1 << pos):
                return pos
@@ -20,7 +20,7 @@ class Bug:
 
    def run(self):
        self.shifter.shift_byte(self.pattern)
-       pos = self.x()
+       pos = self.finder()
        if pos == 7:
            new_pos = 6
        elif pos == 0:
