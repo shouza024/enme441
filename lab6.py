@@ -22,10 +22,11 @@ class Bug:
    def run(self):
        self.shifter.shift_byte(self.pattern)
        pos = self.finder()
-       if pos == 7:
-           new_pos = 6
-       elif pos == 0:
-           new_pos =1
+       if isWrapon = False:
+           if pos == 7:
+               new_pos = 6
+           elif pos == 0:
+               new_pos =1
        else:
            new_pos = pos + random.choice([-1,1])
                                   
