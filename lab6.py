@@ -1,4 +1,4 @@
-import RPi.GPIO as GPIO
+fimport RPi.GPIO as GPIO
 import time
 import shifter
 import random
@@ -19,8 +19,8 @@ class Bug:
        self.pattern =(1<<new_pos)
 
    def run(self):
-       self.shifter.shift_byte(pattern)
-       pos = self.x(pattern)
+       self.shifter.shift_byte(self.pattern)
+       pos = self.x(self.pattern)
        if pos == 7:
            new_pos = 6
        elif pos == 0:
