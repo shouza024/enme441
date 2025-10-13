@@ -17,7 +17,7 @@ pattern = (1 << start_pos)
 
 def x(pattern):
    for pos in range(8):
-       if pattern & (1 << pos)
+       if pattern & (1 << pos):
            return pos
            
 def update(new_pos):
