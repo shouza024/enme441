@@ -31,7 +31,7 @@ GPIO.add_event_detect(s3,GPIO.RISING,callback=s3_call_rise,bouncetime=1000)
 GPIO.add_event_detect(s3,GPIO.FALLING,callback=s3_call_fall,bouncetime=1000)
 
 try:
-    while s1 = True:
+    while s1 == True:
         bug.start()
     else:
         bug.stop()
