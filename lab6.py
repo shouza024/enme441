@@ -13,7 +13,7 @@ pattern = 0b01111110        # 8-bit pattern to display on LED bar
 start_pos=random.randint(0,7)#Choose a random starting positiong
 pattern = 0b00000000               #Initiate empty pattern
 
-pattern |= (1 << start_pos)
+pattern = (1 << start_pos)
 
 def x(pattern):
    for pos,val in enumerate(pattern):
@@ -23,7 +23,7 @@ def x(pattern):
 def update(new_pos):
     global pattern 
     pattern = 0b00000000
-    pattern |=(1<<new_pos) 
+    pattern =(1<<new_pos) 
     
 try:                             
   while 1:
