@@ -19,6 +19,8 @@ class Bug:
            
    def update(self,new_pos):
        self.pattern =(1<<new_pos)
+   def stop(self):
+        self.run = False
 
    def start(self):
        self.run = True
@@ -39,8 +41,6 @@ class Bug:
            self.update(new_pos)
            time.sleep(self.timestep)
           
-    def stop(self):
-        self.run = False
 
 GPIO.setmode(GPIO.BCM)
 
