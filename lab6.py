@@ -8,6 +8,7 @@ class Bug:
    def  __init__(self,shifter,timestep = 0.1,x = 3,isWrapon = False):
        self.shifter = shifter
        self.x = x
+       self.timestep = timestep
        self.pattern = (1 << self.x)
       
    def finder(self):
