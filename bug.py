@@ -19,15 +19,19 @@ bug = Bug.Bug(y)
 
 def s1_call(s1):
     bug.active = not bug.active
+    print("on/off switch pressed")
 
 def s2_call(s2):
     bug.isWrapon = not bug.isWrapon
+    print("wrap button pressed")
 
 def s3_call_rise(s3):
     if GPIO.input(s3):
         bug.timestep = bug.timestep /3
     else:
         bug.timestep = bug.timestep*3
+    print("s3 button pressed")
+          
 GPIO.add_event_detect(s1,GPIO.BOTH,callback=s2_call,bouncetime=1000)
 GPIO.add_event_detect(s2,GPIO.RISING,callback=s2_call,bouncetime=1000)
 GPIO.add_event_detect(s3,GPIO.BOTH,callback=s3_call_rise,bouncetime=1000)
