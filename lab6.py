@@ -16,8 +16,8 @@ pattern = 0b00000000               #Initiate empty pattern
 pattern = (1 << start_pos)
 
 def x(pattern):
-   for pos,val in enumerate(pattern):
-       if val == 1:
+   for pos in range(8):
+       if pattern & (1 << pos)
            return pos
            
 def update(new_pos):
