@@ -32,9 +32,9 @@ def s3_call_rise(s3):
         bug.timestep = bug.timestep*3
     print("s3 button pressed")
           
-GPIO.add_event_detect(s1,GPIO.BOTH,callback=s1_call,bouncetime=1000)
-GPIO.add_event_detect(s2,GPIO.RISING,callback=s2_call,bouncetime=1000)
-GPIO.add_event_detect(s3,GPIO.BOTH,callback=s3_call_rise,bouncetime=1000)
+GPIO.add_event_detect(s1,GPIO.BOTH,callback=s1_call,bouncetime=400)
+GPIO.add_event_detect(s2,GPIO.RISING,callback=s2_call,bouncetime=400)
+GPIO.add_event_detect(s3,GPIO.BOTH,callback=s3_call_rise,bouncetime=400)
 
 
 try:
