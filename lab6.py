@@ -11,7 +11,7 @@ class Shifter:
     def start(self):  
         GPIO.setup(self.serial, GPIO.OUT)
         GPIO.setup(self.latch, GPIO.OUT, initial=0)  
-        GPIO.setup(self.clocl, GPIO.OUT, initial=0)
+        GPIO.setup(self.clock, GPIO.OUT, initial=0)
 
     def __ping(self,p):
         GPIO.output(p,1)
