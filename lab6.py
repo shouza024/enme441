@@ -29,7 +29,7 @@ try:
   x(pattern)
   if x == 7:
       new_pos = 6
-  else if x == 0:
+  elif x == 0:
       new_pos =1
   else:
       new_pos = x + random.choice([-1,1]
