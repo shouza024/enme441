@@ -22,21 +22,18 @@ class Bug:
    def stop(self):
        self.run = False
 
-   def start(self):
-       self.run = True
-       while self.run == True:
-           self.__shifter.shift_byte(self.pattern)
-           pos = self.finder()
-           if self.isWrapon == False:
-               if pos == 7:
-                   new_pos = 6
-               elif pos == 0:
-                   new_pos =1
-           else:
-               new_pos = pos + random.choice([-1,1])
-               if new_pos == 8:
-                   new_pos = 1
-               elif new_pos ==0:
-                   new_pos  = 7
-           self.update(new_pos)
-           time.sleep(self.timestep)
+   def run(self):
+       self.__shifter.shift_byte(self.pattern)
+       pos = self.finder()
+       if self.isWrapon == False:
+           if pos == 7:
+               new_pos = 6
+           elif pos == 0:
+               new_pos =1
+       else:
+           new_pos = pos + random.choice([-1,1])
+           if new_pos == 8:
+               new_pos = 1
+           elif new_pos ==0:
+               new_pos  = 7
+       self.update(new_pos)
