@@ -38,7 +38,7 @@ GPIO.add_event_detect(s3,GPIO.BOTH,callback=s3_call_rise,bouncetime=1000)
 
 try:
     while True:
-        pass:
+        pass
 except KeyboardInterrupt:
   bug.stop()
   GPIO.cleanup()
