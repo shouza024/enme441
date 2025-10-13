@@ -38,7 +38,7 @@ class Bug:
                    new_pos  = 7
            self.update(new_pos)
            time.sleep(self.timestep)
-
+          
     def stop(self):
         self.run = False
 
