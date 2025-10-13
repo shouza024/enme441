@@ -14,21 +14,21 @@ class Bug:
            if self.pattern & (1 << pos):
                return pos
            
-    def update(self,new_pos):
-        self.pattern =(1<<new_pos)
+   def update(self,new_pos):
+       self.pattern =(1<<new_pos)
 
-    def run(self):
-        self.shifter.shift_byte(pattern)
-        pos = self.x(pattern)
-        if pos == 7:
-            new_pos = 6
-        elif pos == 0:
-            new_pos =1
-        else:
-            new_pos = pos + random.choice([-1,1])
+   def run(self):
+       self.shifter.shift_byte(pattern)
+       pos = self.x(pattern)
+       if pos == 7:
+           new_pos = 6
+       elif pos == 0:
+           new_pos =1
+       else:
+           new_pos = pos + random.choice([-1,1])
                                   
-        self.update(new_pos)
-        time.sleep(self.timestep)
+       self.update(new_pos)
+       time.sleep(self.timestep)
 
 GPIO.setmode(GPIO.BCM)
 
