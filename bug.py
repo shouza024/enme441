@@ -18,10 +18,7 @@ y = shifter.shifter(dataPin,latchPin,clockPin)
 bug = Bug.Bug(y)
 
 def s1_call(s1):
-    if GPIO.input(s1):
-        bug.start()
-    else:
-        bug.stop()
+    bug.active = not bug.active
 
 def s2_call(s2):
     bug.isWrapon = not bug.isWrapon
@@ -38,7 +35,9 @@ GPIO.add_event_detect(s3,GPIO.BOTH,callback=s3_call_rise,bouncetime=1000)
 
 try:
     while True:
-        pass
+        if bug.active:
+            bug.run()
+        time.sleep(bug.timestep)
 except KeyboardInterrupt:
   bug.stop()
   GPIO.cleanup()
