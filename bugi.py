@@ -20,6 +20,7 @@ class Bug:
            
    def update(self,new_pos):
        self.pattern =(1<<new_pos)
+      
    def stop(self):
        self.run = False
 
@@ -31,6 +32,8 @@ class Bug:
                new_pos = 6
            elif pos == 0:
                new_pos =1
+           else:
+               new_pos = pos + random.choice([-1,1])
        else:
            new_pos = pos + random.choice([-1,1])
            if new_pos == 8:
