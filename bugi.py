@@ -40,16 +40,3 @@ class Bug:
                    new_pos  = 7
            self.update(new_pos)
            time.sleep(self.timestep)
-          
-
-GPIO.setmode(GPIO.BCM)
-
-dataPin, latchPin, clockPin = 23, 24, 25
-y = shifter.shifter(dataPin,latchPin,clockPin)
-bug = Bug(y,0.05,1,True)
-
-try:                             
-  bug.start()
-except KeyboardInterrupt:
-  bug.stop()
-  GPIO.cleanup()
