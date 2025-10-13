@@ -21,22 +21,23 @@ def x(pattern):
            return pos
            
 def update(new_pos):
+    global pattern 
     pattern = [0]*8
     pattern[new_pos] = 1
     
-try:  
-  y.shift_byte(pattern)
-  pos = x(pattern)
-  if pos == 7:
-      new_pos = 6
-  elif pos == 0:
-      new_pos =1
-  else:
+try:                             
+  while 1:
+      y.shift_byte(pattern)
+      pos = x(pattern)
+      if pos == 7:
+          new_pos = 6
+      elif pos == 0:
+          new_pos =1
+      else:
       new_pos = pos + random.choice([-1,1])
                                   
   update(new_pos)
   time.sleep(0.05)
-                                  
-  while 1: pass
+       
 except KeyboardInterrupt:
   GPIO.cleanup()
