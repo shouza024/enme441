@@ -27,7 +27,7 @@ def update(new_pos):
 try:  
   y.shift_byte(pattern)
   x(pattern)
-  if x == 7;
+  if x == 7:
       new_pos = 6
   else if x == 0:
       new_pos =1
