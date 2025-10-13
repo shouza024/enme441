@@ -22,7 +22,7 @@ class Bug:
 
    def start(self):
        self.run = True
-       while self.run = True:
+       while self.run == True:
            self.__shifter.shift_byte(self.pattern)
            pos = self.finder()
            if self.isWrapon == False:
