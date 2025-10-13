@@ -22,7 +22,7 @@ class Bug:
    def run(self):
        self.shifter.shift_byte(self.pattern)
        pos = self.finder()
-       if isWrapon = False:
+       if isWrapon == False:
            if pos == 7:
                new_pos = 6
            elif pos == 0:
