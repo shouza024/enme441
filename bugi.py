@@ -11,6 +11,7 @@ class Bug:
        self.timestep = timestep
        self.isWrapon = isWrapon
        self.pattern = (1 << self.x)
+       self.active = False
       
    def finder(self):
        for pos in range(8):
