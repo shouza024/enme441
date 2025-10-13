@@ -20,7 +20,7 @@ class Bug:
    def update(self,new_pos):
        self.pattern =(1<<new_pos)
    def stop(self):
-        self.run = False
+       self.run = False
 
    def start(self):
        self.run = True
