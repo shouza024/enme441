@@ -62,7 +62,7 @@ if condition_won ==0:
     print(f"Correct Sequence: ",end="")
     for d in sequence: print(d,end='')
 
-
+#Text written from local computer
 
 
 
