@@ -3,6 +3,7 @@
 import socket
 import RPi.GPIO as GPIO
 import time
+import threading
 
 GPIO.setmode(GPIO.BCM)
 
@@ -29,12 +30,12 @@ def web_page(led_brightness):
     <h2>Lab 7 Question 1</h2>
     <h3> Brightness Level:<h3>
     <form action="/cgi-bin/range.py" method="POST">
-    <input type="range" name="slider1" min ="0" max="1000"
+    <input type="range" name="brightness" min ="0" max="100"
     	value ="0"/><br>
     <p>Select LED:<br>
-    <input type="radio" name="option" value="a"> LED 1 ("""+brightness[0]+"""%)<br>
-    <input type="radio" name="option" value="b"> LED 2 ("""+brightness[1]+"""%)<br>
-    <input type="radio" name="option" value="c"> LED 3 ("""+brightness[2]+"""%) <br>
+    <input type="radio" name="led" value="0"> LED 1 ("""+brightness[0]+"""%)<br>
+    <input type="radio" name="led" value="1"> LED 2 ("""+brightness[1]+"""%)<br>
+    <input type="radio" name="led" value="2"> LED 3 ("""+brightness[2]+"""%) <br>
     <input type="submit" value="Change Brightness">
     </form> 
     </body>
@@ -53,7 +54,11 @@ def parsePOSTdata(data):        ##helper function from class
             data_dict[key_val[0]] = key_val[1]
     return data_dict
 
-def server():                  
+def update_brightness(data_dict):       
+    brightness[data_dict[led]] = int(data_dict[brightness])              ## Reads the data dictionary and updates brigthness list 
+    pwm[data_dict[led]].ChangeDutyCycle(brightness[data_dict[led]])      ## Changes PWM level to new value from data_dict
+
+def server_web_page():         ##         
     while True:
         time.sleep(0.1)
         print('waiting on connection')
@@ -61,16 +66,35 @@ def server():
         message = conn.recv(1024).decode('utf-8')              
         print(f'Message from {client_ip}')   
         data_dict = parsePOSTdata(message)
+        #Maybe needs the if statement not sure tbh
 
-        
         conn.send(b'HTTP/1.1 200 OK\r\n')          
         conn.send(b'Content-type: text/html\r\n') 
         conn.send(b'Connection: close\r\n\r\n') 
+        try:
+            conn.sendall(web_page())
+        finally:
+            conn.close()
 
+        update_brightness(data_dict)    
+        
 #Setup up socket
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 s.bind(('',80))
 s.listen(2)
+
+web_page_thread = threading.Thread(target=server_web_page)
+web_page_thread.daemon = True
+web_page_thread.start()
+
+try:
+    while True:
+        pass
+except:
+    print('joining webpage')
+    web_page_thread.join()
+    print('close socket')
+    s.close
 
 
   
