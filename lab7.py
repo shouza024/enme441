@@ -6,6 +6,7 @@ import time
 import threading
 
 GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
 
 ## Pins labels for LED 1,2,3
 leds = [17, 27, 22]
