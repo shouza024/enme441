@@ -14,7 +14,7 @@ for led in leds: GPIO.setup(led,GPIO.OUT)
 ##Initiate LEDs at x brightness level
 initial_brightness = 20  #User Input
 pwm=[]                  #a list storing pwm object for the three leds
-brightness = []         #a list storing brigthenss level
+brightness = [0 0 0]         #a list storing brigthenss level
 for i,led in enumerate(leds,start=0):      #loops assign initial values for both list above
     p = GPIO.PWM(led,100)
     p.start(initial_brightness)
