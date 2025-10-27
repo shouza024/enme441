@@ -35,9 +35,9 @@ def web_page(led_brightness):
     <input type="range" name="brightness" min ="0" max="100"
     	value ="0"/><br>
     <p>Select LED:<br>
-    <input type="radio" name="led" value="0"> LED 1 ("""+bin(brightness[0])+"""%)<br>
-    <input type="radio" name="led" value="1"> LED 2 ("""+bin(brightness[1])+"""%)<br>
-    <input type="radio" name="led" value="2"> LED 3 ("""+bin(brightness[2])+"""%) <br>
+    <input type="radio" name="led" value="0"> LED 1 ("""+brightness[0]+"""%)<br>
+    <input type="radio" name="led" value="1"> LED 2 ("""+brightness[1]+"""%)<br>
+    <input type="radio" name="led" value="2"> LED 3 ("""+brightness[2]+"""%) <br>
     <input type="submit" value="Change Brightness">
     </form> 
     </body>
@@ -71,7 +71,6 @@ def server_web_page():         ##
         message = conn.recv(1024).decode('utf-8')              
         print(f'Message from {client_ip}')   
         data_dict = parsePOSTdata(message)
-        #Maybe needs the if statement not sure tbh
 
         conn.send(b'HTTP/1.1 200 OK\r\n')          
         conn.send(b'Content-type: text/html\r\n') 
@@ -80,7 +79,7 @@ def server_web_page():         ##
             conn.sendall(web_page(brightness))
         finally:
             conn.close()
-        if 'led' in data_dict and 'brightness' in data_dict:
+        if 'led' in data_dict and 'brightness' in data_dict:#Skips the first GET
             update_brightness(data_dict)
    
         
