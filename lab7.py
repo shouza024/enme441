@@ -1,4 +1,4 @@
-## This is lab 7 code
+## This is lab 7 question 1 code
 
 import socket
 import RPi.GPIO as GPIO
