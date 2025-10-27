@@ -35,9 +35,9 @@ def web_page(led_brightness):
     <input type="range" name="brightness" min ="0" max="100"
     	value ="0"/><br>
     <p>Select LED:<br>
-    <input type="radio" name="led" value="0"> LED 1 ("""+brightness[0]+"""%)<br>
-    <input type="radio" name="led" value="1"> LED 2 ("""+brightness[1]+"""%)<br>
-    <input type="radio" name="led" value="2"> LED 3 ("""+brightness[2]+"""%) <br>
+    <input type="radio" name="led" value="0"> LED 1 ("""+str(brightness[0])+"""%)<br>
+    <input type="radio" name="led" value="1"> LED 2 ("""+str(brightness[1])+"""%)<br>
+    <input type="radio" name="led" value="2"> LED 3 ("""+str(brightness[2])+"""%) <br>
     <input type="submit" value="Change Brightness">
     </form> 
     </body>
@@ -100,23 +100,6 @@ except:
     web_page_thread.join()
     print('close socket')
     s.close
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
