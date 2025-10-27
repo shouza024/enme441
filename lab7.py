@@ -9,7 +9,8 @@ GPIO.setmode(GPIO.BCM)
 
 ## Pins labels for LED 1,2,3
 leds = [17, 27, 22]
-for led in leds: GPIO.setup(led,GPIO.OUT)
+for led in leds:
+    GPIO.setup(led,GPIO.OUT)
 
 ##Initiate LEDs at x brightness level
 initial_brightness = 20  #User Input
