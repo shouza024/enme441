@@ -19,7 +19,7 @@ for i,led in leds:      #loops assign initial values for both list above
     p = GPIO.PWM(led,100)
     p.start(initial_brightness)
     pwm.append(p)
-    brightness(p) = initial_brightness
+    brightness(i) = initial_brightness
 
 
 ##web page function-setups the page window for user to submit desired brightness level input
