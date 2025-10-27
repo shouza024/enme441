@@ -61,6 +61,7 @@ def update_brightness(data_dict):
     g = int(data_dict['brightness'])      
     brightness[c] = g              ## Reads the data dictionary and updates brigthness list 
     pwm[c].ChangeDutyCycle(g)      ## Changes PWM level to new value from data_dict
+    print(f'change led{c} to{g} %')
 
 def server_web_page():         ##         
     while True:
@@ -79,8 +80,9 @@ def server_web_page():         ##
             conn.sendall(web_page(brightness))
         finally:
             conn.close()
-
-        update_brightness(data_dict)    
+        if 'led' in data_dict and 'brightness' in data_dict:
+            update_brightness(data_dict)
+   
         
 #Setup up socket
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -99,6 +101,7 @@ except:
     web_page_thread.join()
     print('close socket')
     s.close
+
 
 
   
