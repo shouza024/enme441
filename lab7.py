@@ -33,9 +33,9 @@ def web_page(led_brightness):
     <input type="range" name="brightness" min ="0" max="100"
     	value ="0"/><br>
     <p>Select LED:<br>
-    <input type="radio" name="led" value="0"> LED 1 ("""+brightness[0]+"""%)<br>
-    <input type="radio" name="led" value="1"> LED 2 ("""+brightness[1]+"""%)<br>
-    <input type="radio" name="led" value="2"> LED 3 ("""+brightness[2]+"""%) <br>
+    <input type="radio" name="led" value="0"> LED 1 ("""+bin(brightness[0])+"""%)<br>
+    <input type="radio" name="led" value="1"> LED 2 ("""+bin(brightness[1])+"""%)<br>
+    <input type="radio" name="led" value="2"> LED 3 ("""+bin(brightness[2])+"""%) <br>
     <input type="submit" value="Change Brightness">
     </form> 
     </body>
