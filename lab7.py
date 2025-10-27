@@ -72,7 +72,7 @@ def server_web_page():         ##
         conn.send(b'Content-type: text/html\r\n') 
         conn.send(b'Connection: close\r\n\r\n') 
         try:
-            conn.sendall(web_page())
+            conn.sendall(web_page(brightness))
         finally:
             conn.close()
 
