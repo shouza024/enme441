@@ -42,7 +42,7 @@ def web_page(led_brightness):
     </html>
     """
     return bytes(html,'utf-8')
-
+#d
 def parsePOSTdata(data):        ##helper function from class
     data_dict = {}
     idx = data.find('\r\n\r\n')+4
