@@ -71,7 +71,8 @@ def server_web_page():         ##
         message = conn.recv(1024).decode('utf-8')              
         print(f'Message from {client_ip}')   
         data_dict = parsePOSTdata(message)
-
+        if 'led' in data_dict and 'brightness' in data_dict:#Skips the first GET
+            update_brightness(data_dict)
         conn.send(b'HTTP/1.1 200 OK\r\n')          
         conn.send(b'Content-type: text/html\r\n') 
         conn.send(b'Connection: close\r\n\r\n') 
@@ -79,8 +80,6 @@ def server_web_page():         ##
             conn.sendall(web_page(brightness))
         finally:
             conn.close()
-        if 'led' in data_dict and 'brightness' in data_dict:#Skips the first GET
-            update_brightness(data_dict)
    
         
 #Setup up socket
