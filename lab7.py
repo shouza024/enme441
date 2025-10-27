@@ -57,7 +57,7 @@ def parsePOSTdata(data):        ##helper function from class
     return data_dict
 
 def update_brightness(data_dict):
-    c = int(data_dict['led'])
+    led_index = {'0': 0, '1': 1, '2': 2}[data_dict['led']] 
     g = int(data_dict['brightness'])      
     brightness[c] = g              ## Reads the data dictionary and updates brigthness list 
     pwm[c].ChangeDutyCycle(g)      ## Changes PWM level to new value from data_dict
