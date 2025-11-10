@@ -81,7 +81,7 @@ class Stepper:
 
     # Move to an absolute angle taking the shortest possible path:
     def __goAngle(self, angle):
-        angle = angle % 360            #turns any angle to a number between 0 and 360
+        angle = abs(angle) % 360            #turns any angle to a number between 0 and 360
         if self.angle.value >angle:
             difference_cw = (angle+360)-self.angle.value
             difference_ccw= self.angle.value-angle
@@ -135,7 +135,7 @@ if __name__ == '__main__':
     m1.zero()
     m2.zero()
 
-    '''
+   
     #Testing code from lab 8
     m1.rotate(-90)
     m1.rotate(45)
@@ -156,7 +156,7 @@ if __name__ == '__main__':
     m1.goAngle(-135)
     m1.goAngle(135)
     m1.goAngle(0)
-
+    '''
     try:
         while True:
             pass
