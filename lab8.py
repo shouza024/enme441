@@ -80,7 +80,7 @@ class Stepper:
         p.start()
 
     # Move to an absolute angle taking the shortest possible path:
-    def goAngle(self, angle):
+    def __goAngle(self, angle):
         angle = angle % 360            #turns any angle to a number between 0 and 360
         if self.angle.value >angle:
             difference_cw = (angle+360)-self.angle.value
@@ -103,6 +103,12 @@ class Stepper:
 
          # COMPLETE THIS METHOD FOR LAB 8
 
+    def goAngle(self,angle):
+        time.sleep(0.1)
+        n = multiprocessing.Process(target=self.__goAngle, args=(angle,))
+        n.start()
+
+
     # Set the motor zero point
     def zero(self):
         self.angle.value = 0
@@ -120,8 +126,9 @@ if __name__ == '__main__':
     lock2 = multiprocessing.Lock()
 
     # Instantiate 2 Steppers:
-    m1 = Stepper(s, lock1)
     m2 = Stepper(s, lock2)
+    m1 = Stepper(s, lock1)
+    
     
 
     # Zero the motors:
