@@ -41,7 +41,7 @@ class Stepper:
 
     def __init__(self, shifter, lock):
         self.s = shifter           # shift register
-        self.angle = 0             # current output shaft angle
+        self.angle = multiprocessing.Value('d',0.0)             # current output shaft angle
         self.step_state = 0        # track position in sequence
         self.shifter_bit_start = 4*Stepper.num_steppers  # starting bit position
         self.lock = lock           # multiprocessing lock
@@ -57,11 +57,11 @@ class Stepper:
     def __step(self, dir):
         self.step_state += dir    # increment/decrement the step
         self.step_state %= 8      # ensure result stays in [0,7]
-        Stepper.shifter_outputs |= 0b1111<<self.shifter_bit_start
-        Stepper.shifter_outputs &= Stepper.seq[self.step_state]<<self.shifter_bit_start
+        Stepper.shifter_outputs &= 0b11110000>>self.shifter_bit_start
+        Stepper.shifter_outputs |= Stepper.seq[self.step_state]<<self.shifter_bit_start
         self.s.shiftByte(Stepper.shifter_outputs)
-        self.angle += dir/Stepper.steps_per_degree
-        self.angle %= 360         # limit to [0,359.9+] range
+        self.angle.value += dir/Stepper.steps_per_degree
+        self.angle.value %= 360         # limit to [0,359.9+] range
 
     # Move relative angle from current position:
     def __rotate(self, delta):
@@ -81,12 +81,31 @@ class Stepper:
 
     # Move to an absolute angle taking the shortest possible path:
     def goAngle(self, angle):
-         pass
+        angle = angle % 360            #turns any angle to a number between 0 and 360
+        if self.angle.value >angle:
+            difference_cw = (angle+360)-self.angle.value
+            difference_ccw= self.angle.value-angle
+        else:
+            difference_cw = angle-self.angle.value
+            difference_ccw= self.angle.value+(360-angle)
+        if difference_ccw<difference_cw:
+            dir = 1
+            delta_angle = difference_ccw
+        else:
+            dir = -1
+            delta_angle = difference_cw
+        num_steps = int(Stepper.steps_per_degree * abs(delta_angle))
+        self.lock.acquire() 
+        for s in range(num_steps):      # take the steps
+            self.__step(dir)
+            time.sleep(Stepper.delay/1e6)
+        self.lock.release()
+
          # COMPLETE THIS METHOD FOR LAB 8
 
     # Set the motor zero point
     def zero(self):
-        self.angle = 0
+        self.angle.value = 0
 
 
 # Example use:
@@ -97,18 +116,18 @@ if __name__ == '__main__':
 
     # Use multiprocessing.Lock() to prevent motors from trying to 
     # execute multiple operations at the same time:
-    lock = multiprocessing.Lock()
+    lock1 = multiprocessing.Lock()
+    lock2 = multiprocessing.Lock()
 
     # Instantiate 2 Steppers:
-    m1 = Stepper(s, lock)
-    m2 = Stepper(s, lock)
+    m1 = Stepper(s, lock1)
+    m2 = Stepper(s, lock2)
 
     # Zero the motors:
     m1.zero()
     m2.zero()
 
-    # Move as desired, with eacg step occuring as soon as the previous 
-    # step ends:
+    #Testing code from lab 8
     m1.rotate(-90)
     m1.rotate(45)
     m1.rotate(-90)
@@ -120,9 +139,6 @@ if __name__ == '__main__':
     m2.rotate(-45)
     m2.rotate(45)
     m2.rotate(-90)
- 
-    # While the motors are running in their separate processes, the main
-    # code can continue doing its thing: 
     try:
         while True:
             pass
