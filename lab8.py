@@ -120,8 +120,9 @@ if __name__ == '__main__':
     lock2 = multiprocessing.Lock()
 
     # Instantiate 2 Steppers:
-    m1 = Stepper(s, lock1)
     m2 = Stepper(s, lock2)
+    m1 = Stepper(s, lock1)
+    
 
     # Zero the motors:
     m1.zero()
