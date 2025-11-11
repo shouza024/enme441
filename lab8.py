@@ -57,9 +57,10 @@ class Stepper:
     def __step(self, dir):
         self.step_state += dir    # increment/decrement the step
         self.step_state %= 8      # ensure result stays in [0,7]
-        Stepper.shifter_outputs &= 0b11110000>>self.shifter_bit_start
-        Stepper.shifter_outputs |= Stepper.seq[self.step_state]<<self.shifter_bit_start
-        self.s.shiftByte(Stepper.shifter_outputs)
+        with self.lock:
+            Stepper.shifter_outputs &= 0b11110000>>self.shifter_bit_start
+            Stepper.shifter_outputs |= Stepper.seq[self.step_state]<<self.shifter_bit_start
+            self.s.shiftByte(Stepper.shifter_outputs)
         self.angle.value += dir/Stepper.steps_per_degree
         self.angle.value %= 360         # limit to [0,359.9+] range
 
@@ -80,7 +81,7 @@ class Stepper:
         p.start()
 
     # Move to an absolute angle taking the shortest possible path:
-    def __goAngle(self, angle):
+    def goAngle(self, angle):
         angle = abs(angle) % 360            #turns any angle to a number between 0 and 360
         if self.angle.value >angle:
             difference_cw = (angle+360)-self.angle.value
@@ -94,19 +95,10 @@ class Stepper:
         else:
             dir = -1
             delta_angle = difference_cw
-        num_steps = int(Stepper.steps_per_degree * abs(delta_angle))
-        self.lock.acquire() 
-        for s in range(num_steps):      # take the steps
-            self.__step(dir)
-            time.sleep(Stepper.delay/1e6)
-        self.lock.release()
+        return self.rotate(delta_angle)
+        
 
          # COMPLETE THIS METHOD FOR LAB 8
-
-    def goAngle(self,angle):
-        time.sleep(0.1)
-        n = multiprocessing.Process(target=self.__goAngle, args=(angle,))
-        n.start()
 
 
     # Set the motor zero point
@@ -122,12 +114,11 @@ if __name__ == '__main__':
 
     # Use multiprocessing.Lock() to prevent motors from trying to 
     # execute multiple operations at the same time:
-    lock1 = multiprocessing.Lock()
-    lock2 = multiprocessing.Lock()
+    lock = multiprocessing.Lock()
 
     # Instantiate 2 Steppers:
-    m2 = Stepper(s, lock2)
-    m1 = Stepper(s, lock1)
+    m2 = Stepper(s, lock)
+    m1 = Stepper(s, lock)
     
     
 
@@ -135,28 +126,28 @@ if __name__ == '__main__':
     m1.zero()
     m2.zero()
 
-   
-    #Testing code from lab 8
-    m1.rotate(-90)
-    m1.rotate(45)
-    m1.rotate(-90)
-    m1.rotate(45)
+    #Testing motion
+    p1 = m1.goAngle(90)
+    p2 = m2.goAngle(-90)
+    p1.join()
+    p2.join()
 
-    # If separate multiprocessing.lock objects are used, the second motor
-    # will run in parallel with the first motor:
-    m2.rotate(180)
-    m2.rotate(-45)
-    m2.rotate(45)
-    m2.rotate(-90)
-    '''
-    m1.goAngle(90)
-    m1.goAngle(-45)
-    m2.goAngle(-90)
-    m2.goAngle(45)
-    m1.goAngle(-135)
-    m1.goAngle(135)
-    m1.goAngle(0)
-    '''
+    
+    p1 = m1.goAngle(-45)
+    p2 = m2.goAngle(45)
+    p1.join()
+    p2.join()
+    
+    
+    p1 = m1.goAngle(-135)
+    p1.join()
+    
+    p1 = m1.goAngle(135)
+    p1.join()
+    
+    p1 = m1.goAngle(0)
+    p1.join()
+
     try:
         while True:
             pass
