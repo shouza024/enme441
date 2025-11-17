@@ -30,9 +30,9 @@ def parse_json():
     turret = [[id['r'],id['theta']] for id in data['turrets'].values()]
     globe  = [[i['r'],i['theta'],i['z']] for i in data['globes']]
 
-    #turret[id][r,theta]
-    #globe[id][r,theta,z] How to any values from the json file
-    print(turret[1][1])
+    #turret[id][r,theta] 
+    #globe[id][r,theta,z] How to find any values from the json file
+    print(turret[1][1]) #Print turret radius of turret id 1.
 
 
 #-----------------HTML Setup-----------------------------------
