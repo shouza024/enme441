@@ -284,10 +284,10 @@ def server_web_page():         ##
 
 
 #------------------------Socket Setup----------------------------
-parse_json()
+
 
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-s.bind(('',8084))
+s.bind(('10.112.150.68',8084))
 s.listen(3)
 
 web_page_thread = threading.Thread(target=server_web_page)
@@ -296,8 +296,8 @@ server_thread = threading.Thread(target=run_server)
 server_thread.daemon = True
 web_page_thread.start()
 server_thread.start()
-
-
+time.sleep(3)
+parse_json()
 
 
 
