@@ -294,7 +294,7 @@ def server_web_page():         ##
 
 
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-s.bind(('10.112.150.68',8084))
+s.bind(('',8084))
 s.listen(3)
 
 web_page_thread = threading.Thread(target=server_web_page)
