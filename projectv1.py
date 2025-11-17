@@ -250,7 +250,7 @@ def server_web_page():         ##
 
 #------------------------Socket Setup----------------------------
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-s.bind(('',80))
+s.bind(('',4080))
 s.listen(2)
 
 web_page_thread = threading.Thread(target=server_web_page)
