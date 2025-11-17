@@ -40,10 +40,15 @@ def run_server():
     print("client connected from", addr)
 
     # Send the JSON to the client
-    conn.sendall(json_data.encode("utf-8"))
+    response = "HTTP/1.1 200 OK\r\n" \
+               "Content-Type: application/json\r\n" \
+               "Content-Length: {}\r\n" \
+               "Connection: close\r\n\r\n{}".format(len(json_data), json_data)  
+    conn.sendall(response.encode("utf-8"))
 
     conn.close()
     server.close()
+
 
 
 #-------------------Parsing Json-------------------------------
@@ -67,6 +72,8 @@ def parse_json():
     #turret[id][r,theta] 
     #globe[id][r,theta,z] How to find any values from the json file
     print(turret[1][1]) #Print turret radius of turret id 1.
+
+
 
 
 #-----------------HTML Setup-----------------------------------
@@ -296,7 +303,7 @@ server_thread = threading.Thread(target=run_server)
 server_thread.daemon = True
 web_page_thread.start()
 server_thread.start()
-time.sleep(3)
+time.sleep(1)
 parse_json()
 
 
