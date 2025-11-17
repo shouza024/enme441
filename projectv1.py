@@ -59,7 +59,7 @@ def parse_json():
     response = requests.get(url)
     response.raise_for_status() 
     data = response.json()
-    
+    print("json filed parsed and copied")
     '''
     #This code parse the example.json file, only use while in testing
     with open("example.json", "r") as file:
@@ -278,8 +278,8 @@ def server_web_page():         ##
         message = conn.recv(1024).decode('utf-8')              
         print(f'Message from {client_ip}')   
         data_dict = parsePOSTdata(message)
-        if 'word in html' in data_dict and 'a word from html' in data_dict: #Skips the first GET, and only runs the code updating golbal variables
-            #updating code
+        if 'azimith' in data_dict and 'altitude' in data_dict: #Skips the first GET, and only runs the code updating golbal variables
+            print(data_dict['azimith'])
             print("Not ready yet")
         conn.send(b'HTTP/1.1 200 OK\r\n')          
         conn.send(b'Content-type: text/html\r\n') 
@@ -311,7 +311,7 @@ parse_json()
 try:
     while True:
         time.sleep(10)      #some wait
-              
+
     
 except KeyboardInterrupt:
     print("Could not fetch JSON FILE")
