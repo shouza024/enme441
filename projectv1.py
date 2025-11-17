@@ -260,6 +260,7 @@ parse_json()
 
 try:
     while True:
+        time.sleep(10)
         print()
     
 except KeyboardInterrupt:
