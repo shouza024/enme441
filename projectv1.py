@@ -310,9 +310,8 @@ parse_json()
 
 try:
     while True:
-        time.sleep(10)
-        print(turret)
-        print(globe)
+        time.sleep(10)      #some wait
+              
     
 except KeyboardInterrupt:
     print("Could not fetch JSON FILE")
