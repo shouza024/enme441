@@ -1,10 +1,3 @@
-# stepper_class_shiftregister_multiprocessing.py
-#
-# Stepper class
-#
-# Because only one motor action is allowed at a time, multithreading could be
-# used instead of multiprocessing. However, the GIL makes the motor process run 
-# too slowly on the Pi Zero, so multiprocessing is needed.
 
 import time
 import multiprocessing
@@ -98,59 +91,6 @@ class Stepper:
         
         return self.rotate(delta_angle)
         
-
-         # COMPLETE THIS METHOD FOR LAB 8
-
-
     # Set the motor zero point
     def zero(self):
         self.angle.value = 0
-
-
-# Example use:
-
-if __name__ == '__main__':
-
-    s = Shifter(data=16,latch=20,clock=21)   # set up Shifter
-
-    # Use multiprocessing.Lock() to prevent motors from trying to 
-    # execute multiple operations at the same time:
-    lock = multiprocessing.Lock()
-
-    # Instantiate 2 Steppers:
-    m2 = Stepper(s, lock)
-    m1 = Stepper(s, lock)
-    
-    
-
-    # Zero the motors:
-    m1.zero()
-    m2.zero()
-
-    #Testing motion
-    p1 = m1.goAngle(90)
-    p2 = m2.goAngle(-90)
-    p1.join()
-    p2.join()
-
-    
-    p1 = m1.goAngle(-45)
-    p2 = m2.goAngle(45)
-    p1.join()
-    p2.join()
-    
-    
-    p1 = m1.goAngle(-135)
-    p1.join()
-    
-    p1 = m1.goAngle(135)
-    p1.join()
-    
-    p1 = m1.goAngle(0)
-    p1.join()
-
-    try:
-        while True:
-            pass
-    except:
-        print('\nend')

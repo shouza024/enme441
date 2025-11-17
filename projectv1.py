@@ -4,10 +4,13 @@ import time
 #import requests
 import json
 import socket
+import stepper_class
 
 #-------------------Global Variables---------------------------
-turret=[]
-globe=[]
+turret=[]   #list
+globe=[]    #list
+azmith=0    #deg
+altitude=0  #deg
 
 #-------------------Parsing Json-------------------------------
 url = "" #INSERT URL WHEN RELEASED
@@ -30,6 +33,7 @@ def parse_json():
     #globe[id][r,theta,z] How to any values from the json file
 
 
+
 #-----------------HTML Setup-----------------------------------
 ##web page function-setups the page window for user to submit desired brightness level input
 def web_page(led_brightness):
@@ -50,13 +54,39 @@ def parsePOSTdata(data):        ##helper function from class
             data_dict[key_val[0]] = key_val[1]
     return data_dict
 
+def server_web_page():         ##         
+    while True:
+        time.sleep(0.1)
+        print('waiting on connection')
+        conn,(client_ip,client_port) = s.accept()
+        message = conn.recv(1024).decode('utf-8')              
+        print(f'Message from {client_ip}')   
+        data_dict = parsePOSTdata(message)
+        if 'word in html' in data_dict and 'a word from html' in data_dict: #Skips the first GET, and only runs the code updating golbal variables
+            #updating code
+            print("Not ready yet")
+        conn.send(b'HTTP/1.1 200 OK\r\n')          
+        conn.send(b'Content-type: text/html\r\n') 
+        conn.send(b'Connection: close\r\n\r\n') 
+        try:
+            conn.sendall(web_page(brightness))
+        finally:
+            conn.close()
 
 
+#------------------------Socket Setup----------------------------
+s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+s.bind(('',80))
+s.listen(2)
 
-
+web_page_thread = threading.Thread(target=server_web_page)
+web_page_thread.daemon = True
+web_page_thread.start()
+parse_json()
 
 try:
-    parse_json()
-
+    while True:
+        print()
+    
 except KeyboardInterrupt:
     print("Could not fetch JSON FILE")
