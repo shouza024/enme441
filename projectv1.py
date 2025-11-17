@@ -5,12 +5,13 @@ import time
 import json
 import socket
 import stepper_class
+import threading
 
 #-------------------Global Variables---------------------------
 turret=[]   #list
 globe=[]    #list
-azmith=0    #deg
-altitude=0  #deg
+azimuth=0    #rad
+altitude=0  #rad
 
 #-------------------Parsing Json-------------------------------
 url = "" #INSERT URL WHEN RELEASED
@@ -36,7 +37,7 @@ def parse_json():
 
 #-----------------HTML Setup-----------------------------------
 ##web page function-setups the page window for user to submit desired brightness level input
-def web_page(led_brightness):
+def web_page():
     html = """
     <!DOCTYPE html>
 <html>
@@ -242,7 +243,7 @@ def server_web_page():         ##
         conn.send(b'Content-type: text/html\r\n') 
         conn.send(b'Connection: close\r\n\r\n') 
         try:
-            conn.sendall(web_page(brightness))
+            conn.sendall(web_page())
         finally:
             conn.close()
 
