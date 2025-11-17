@@ -71,7 +71,7 @@ def parse_json():
 
     #turret[id][r,theta] 
     #globe[id][r,theta,z] How to find any values from the json file
-    print(turret[1][1]) #Print turret radius of turret id 1.
+    #print(turret[1][1]) #Print turret radius of turret id 1.
 
 
 
@@ -311,7 +311,8 @@ parse_json()
 try:
     while True:
         time.sleep(10)
-        print()
+        print(turret)
+        print(globe)
     
 except KeyboardInterrupt:
     print("Could not fetch JSON FILE")
