@@ -38,7 +38,180 @@ def parse_json():
 ##web page function-setups the page window for user to submit desired brightness level input
 def web_page(led_brightness):
     html = """
-    Insert html here
+    <!DOCTYPE html>
+<html>
+<head>
+  <title>Laser Turret Calibration</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #050510;
+      font-family: 'Orbitron', sans-serif;
+      color: #00eaff;
+      background-image: 
+        linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+
+    .calibration-card {
+      background: rgba(0, 30, 50, 0.35);
+      border: 1px solid #00eaff;
+      border-radius: 18px;
+      padding: 35px 45px;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+      width: 420px;
+      backdrop-filter: blur(10px);
+      animation: fadeIn 1s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 26px;
+      letter-spacing: 3px;
+      color: #7fedff;
+      text-shadow: 0 0 8px #00eaff;
+    }
+
+    label {
+      font-size: 16px;
+      text-shadow: 0 0 5px #00eaff;
+    }
+
+    .input-row {
+      margin-bottom: 22px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      border-radius: 10px;
+      border: 1px solid #00b3cc;
+      background: rgba(0, 0, 20, 0.6);
+      color: #a7faff;
+      font-size: 18px;
+      outline: none;
+      transition: 0.3s;
+      box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.2);
+    }
+
+    input[type="text"]:focus {
+      border-color: #00eaff;
+      box-shadow: 0 0 12px rgba(0, 255, 255, 0.6);
+    }
+
+    .error {
+      font-size: 13px;
+      color: #ff6b6b;
+      margin-top: 5px;
+      min-height: 16px;
+      text-shadow: 0 0 5px #ff3b3b;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      font-size: 18px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 10px;
+      background: linear-gradient(135deg, #0047ff, #00eaff);
+      color: white;
+      font-weight: bold;
+      letter-spacing: 2px;
+      box-shadow: 0 0 15px rgba(0, 160, 255, 0.7);
+      transition: 0.25s;
+    }
+
+    button:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 25px rgba(0, 220, 255, 1);
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div class="calibration-card">
+    <h2>LASER TURRET CALIBRATION</h2>
+
+    <form id="calibrationForm" action="/set_zero.php" method="POST">
+      
+      <div class="input-row">
+        <label for="altitude">Altitude Angle (Δφ):</label>
+        <input type="text" id="altitude" name="altitude" placeholder="Enter altitude offset">
+        <div id="altitudeError" class="error"></div>
+      </div>
+
+      <div class="input-row">
+        <label for="azimuth">Azimuth Angle (Δθ):</label>
+        <input type="text" id="azimuth" name="azimuth" placeholder="Enter azimuth offset">
+        <div id="azimuthError" class="error"></div>
+      </div>
+
+      <button id="submitBtn" type="submit">SET ZERO POSITION</button>
+
+    </form>
+  </div>
+
+
+  <script>
+    const altitudeInput = document.getElementById("altitude");
+    const azimuthInput = document.getElementById("azimuth");
+    const altitudeError = document.getElementById("altitudeError");
+    const azimuthError = document.getElementById("azimuthError");
+    const submitBtn = document.getElementById("submitBtn");
+
+    function validateAngle(value) {
+      if (value === "") return "Field cannot be empty.";
+      if (isNaN(value)) return "Angle must be a number.";
+      const num = Number(value);
+      if (num < -180 || num > 180) return "Angle must be between -180° and 180°.";
+      return "";
+    }
+
+    function validateForm() {
+      const altErr = validateAngle(altitudeInput.value);
+      const aziErr = validateAngle(azimuthInput.value);
+
+      altitudeError.textContent = altErr;
+      azimuthError.textContent = aziErr;
+
+      submitBtn.disabled = altErr || aziErr;
+    }
+
+    altitudeInput.addEventListener("input", validateForm);
+    azimuthInput.addEventListener("input", validateForm);
+  </script>
+
+</body>
+</html>
+
     """
     return bytes(html,'utf-8')
 
