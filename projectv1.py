@@ -13,19 +13,53 @@ globe=[]    #list
 azimuth=0    #rad
 altitude=0  #rad
 
+#------------------Server running with json file------------------------------
+data ={
+ "turrets": {
+ "1": {"r": 300.0, "theta": 2.580 },
+ "2": {"r": 300.0, "theta": 0.661 },
+ "3": {"r": 300.0, "theta": 5.152 }
+ },
+ "globes": [
+ { "r": 300.0, "theta": 1.015, "z": 20.4 },
+ { "r": 300.0, "theta": 4.512, "z": 32.0 },
+ { "r": 300.0, "theta": 3.979, "z": 10.8 },
+ { "r": 300.0, "theta": 7.918, "z": 14.5}
+ ]
+}
+
+json_data = json.dumps(data)
+def run_server():
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind(("", 4084))   
+    server.listen(1)
+
+    print("waiting for connection")
+
+    conn, addr = server.accept()
+    print("client connected from", addr)
+
+    # Send the JSON to the client
+    conn.sendall(json_data.encode("utf-8"))
+
+    conn.close()
+    server.close()
+
+
 #-------------------Parsing Json-------------------------------
 url = "" #INSERT URL WHEN RELEASED
 
 def parse_json():
-    ''' This code is for parsing the url, currently we dont have url so will be commented out until we get that
+    
     response = requests.get(url)
     response.raise_for_status() 
     data = response.json()
+    
     '''
     #This code parse the example.json file, only use while in testing
     with open("example.json", "r") as file:
         data = json.load(file)
-
+    '''
 
     turret = [[id['r'],id['theta']] for id in data['turrets'].values()]
     globe  = [[i['r'],i['theta'],i['z']] for i in data['globes']]
@@ -231,7 +265,7 @@ def parsePOSTdata(data):        ##helper function from class
 
 def server_web_page():         ##         
     while True:
-        time.sleep(0.1)
+        time.sleep(0.5)
         print('waiting on connection')
         conn,(client_ip,client_port) = s.accept()
         message = conn.recv(1024).decode('utf-8')              
@@ -250,14 +284,22 @@ def server_web_page():         ##
 
 
 #------------------------Socket Setup----------------------------
+parse_json()
+
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-s.bind(('',4084))
-s.listen(2)
+s.bind(('',8084))
+s.listen(3)
 
 web_page_thread = threading.Thread(target=server_web_page)
 web_page_thread.daemon = True
+server_thread = threading.Thread(target=run_server)
+server_thread.daemon = True
 web_page_thread.start()
-parse_json()
+server_thread.start()
+
+
+
+
 
 try:
     while True:
