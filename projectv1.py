@@ -164,13 +164,13 @@ def web_page():
     <form id="calibrationForm" action="/set_zero.php" method="POST">
       
       <div class="input-row">
-        <label for="altitude">Altitude Angle (Δφ):</label>
+        <label for="altitude">Altitude Angle:</label>
         <input type="text" id="altitude" name="altitude" placeholder="Enter altitude offset">
         <div id="altitudeError" class="error"></div>
       </div>
 
       <div class="input-row">
-        <label for="azimuth">Azimuth Angle (Δθ):</label>
+        <label for="azimuth">Azimuth Angle:</label>
         <input type="text" id="azimuth" name="azimuth" placeholder="Enter azimuth offset">
         <div id="azimuthError" class="error"></div>
       </div>
@@ -213,6 +213,7 @@ def web_page():
 </body>
 </html>
 
+ 
     """
     return bytes(html,'utf-8')
 
