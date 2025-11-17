@@ -1,7 +1,7 @@
 import multiprocessing
 import time
-#import RPi.GPIO as GPIO
-#import requests
+import RPi.GPIO as GPIO
+import requests
 import json
 import socket
 import stepper_class
