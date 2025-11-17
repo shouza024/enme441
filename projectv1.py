@@ -31,7 +31,7 @@ data ={
 json_data = json.dumps(data)
 def run_server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(("", 4084))   
+    server.bind(("127.0.0.1", 4084))   
     server.listen(1)
 
     print("waiting for connection")
@@ -60,7 +60,7 @@ def parse_json():
     with open("example.json", "r") as file:
         data = json.load(file)
     '''
-
+    global turret, globe
     turret = [[id['r'],id['theta']] for id in data['turrets'].values()]
     globe  = [[i['r'],i['theta'],i['z']] for i in data['globes']]
 
