@@ -34,7 +34,7 @@ def run_server():
     server.bind(("10.112.150.68", 4084))   
     server.listen(1)
 
-    print("waiting for connection")
+    print("waiting for connection json server")
 
     conn, addr = server.accept()
     print("client connected from", addr)
@@ -266,7 +266,7 @@ def parsePOSTdata(data):        ##helper function from class
 def server_web_page():         ##         
     while True:
         time.sleep(0.5)
-        print('waiting on connection')
+        print('waiting on connection html')
         conn,(client_ip,client_port) = s.accept()
         message = conn.recv(1024).decode('utf-8')              
         print(f'Message from {client_ip}')   
