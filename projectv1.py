@@ -32,7 +32,7 @@ def parse_json():
 
     #turret[id][r,theta]
     #globe[id][r,theta,z] How to any values from the json file
-
+    print(turret[1][1])
 
 
 #-----------------HTML Setup-----------------------------------
