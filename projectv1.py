@@ -31,7 +31,7 @@ data ={
 json_data = json.dumps(data)
 def run_server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(("127.0.0.1", 4084))   
+    server.bind(("10.112.150.68", 4084))   
     server.listen(1)
 
     print("waiting for connection")
@@ -47,7 +47,7 @@ def run_server():
 
 
 #-------------------Parsing Json-------------------------------
-url = "http://127.0.0.1:4084" #INSERT URL WHEN RELEASED
+url = "http://10.112.150.68:4084" #INSERT URL WHEN RELEASED
 
 def parse_json():
     
