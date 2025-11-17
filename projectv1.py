@@ -47,7 +47,7 @@ def run_server():
 
 
 #-------------------Parsing Json-------------------------------
-url = "http://onepi.local:4084" #INSERT URL WHEN RELEASED
+url = "http://127.0.0.1:4084" #INSERT URL WHEN RELEASED
 
 def parse_json():
     
