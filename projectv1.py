@@ -193,6 +193,17 @@ def web_page():
       cursor: not-allowed;
       box-shadow: none;
     }
+
+    /* Emergency Stop Styling */
+    .stop-button {
+      background: linear-gradient(135deg, #ff0000, #a80000);
+      box-shadow: 0 0 15px rgba(255, 40, 40, 0.8);
+    }
+    .stop-button:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 25px rgba(255, 80, 80, 1);
+    }
+
   </style>
 
 </head>
@@ -218,8 +229,10 @@ def web_page():
 
       <button id="submitBtn" type="submit">SET ZERO POSITION</button>
 
-      <!-- ⭐ NEW BUTTON ⭐ -->
       <button type="button" id="runBtn" onclick="startRun()">INITIATE RUN</button>
+
+      <!-- ⭐ EMERGENCY STOP BUTTON ⭐ -->
+      <button type="button" class="stop-button" onclick="emergencyStop()">EMERGENCY STOP</button>
 
     </form>
   </div>
@@ -231,6 +244,9 @@ def web_page():
     const altitudeError = document.getElementById("altitudeError");
     const azimuthError = document.getElementById("azimuthError");
     const submitBtn = document.getElementById("submitBtn");
+    const runBtn = document.getElementById("runBtn");
+
+    let runInProgress = false;
 
     function validateAngle(value) {
       if (value === "") return "Field cannot be empty.";
@@ -253,15 +269,48 @@ def web_page():
     altitudeInput.addEventListener("input", validateForm);
     azimuthInput.addEventListener("input", validateForm);
 
-    // ⭐ Placeholder function — customize as needed
+    // -------------------------- RUN LOGIC --------------------------
+
     function startRun() {
-      alert("Run initiated! (Replace this with your real function)");
-      // You can call fetch("/start_run.php") or anything you need here
+      if (runInProgress) return; // safety check
+
+      runInProgress = true;
+      runBtn.disabled = true;    // lock button
+      runBtn.textContent = "RUNNING...";
+
+      // Call your backend
+      // fetch("/start_run.php");
+
+      // TEMP: Simulated 8s run
+      setTimeout(() => {
+        finishRun();
+      }, 8000);
     }
+
+    function finishRun() {
+      runInProgress = false;
+      runBtn.disabled = false;
+      runBtn.textContent = "INITIATE RUN";
+    }
+
+    // ----------------------- EMERGENCY STOP ------------------------
+
+    function emergencyStop() {
+      // Call backend stop script:
+      // fetch("/stop.php");
+
+      runInProgress = false;
+      runBtn.disabled = false;
+      runBtn.textContent = "INITIATE RUN";
+
+      alert("EMERGENCY STOP ACTIVATED!");
+    }
+
   </script>
 
 </body>
 </html>
+
 
  
     """
