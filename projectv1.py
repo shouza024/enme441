@@ -81,127 +81,80 @@ def parse_json():
 def web_page():
     html = """
     <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Radar Turret Controller</title>
+  <title>Laser Turret Calibration</title>
 
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
     body {
-      font-family: Arial, sans-serif;
-      background-color: #0a0f24;
-      color: #ffffff;
-      text-align: center;
       margin: 0;
       padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #050510;
+      font-family: 'Orbitron', sans-serif;
+      color: #00eaff;
+      background-image: 
+        linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
+      background-size: 30px 30px;
     }
 
-    h1 {
-      margin-top: 20px;
-      font-size: 28px;
-      text-shadow: 0 0 15px #00bfff;
+    .calibration-card {
+      background: rgba(0, 30, 50, 0.35);
+      border: 1px solid #00eaff;
+      border-radius: 18px;
+      padding: 35px 45px;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+      width: 420px;
+      backdrop-filter: blur(10px);
+      animation: fadeIn 1s ease-out;
     }
 
-    .card {
-      background-color: #11182f;
-      padding: 25px;
-      margin: 40px auto;
-      width: 85%;
-      max-width: 600px;
-      border-radius: 20px;
-      box-shadow: 0 0 35px rgba(0, 191, 255, 0.4);
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 26px;
+      letter-spacing: 3px;
+      color: #7fedff;
+      text-shadow: 0 0 8px #00eaff;
     }
 
     label {
-      display: block;
-      margin-top: 15px;
-      font-size: 18px;
+      font-size: 16px;
+      text-shadow: 0 0 5px #00eaff;
     }
 
-    input[type="number"] {
-      width: 80%;
-      padding: 10px;
-      margin-top: 5px;
+    .input-row {
+      margin-bottom: 22px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
       border-radius: 10px;
-      border: none;
-      outline: none;
+      border: 1px solid #00b3cc;
+      background: rgba(0, 0, 20, 0.6);
+      color: #a7faff;
       font-size: 18px;
-      text-align: center;
-    }
-
-    button {
-      margin-top: 25px;
-      padding: 15px 30px;
-      background: linear-gradient(135deg, #1e90ff, #00bfff);
-      color: white;
-      font-weight: bold;
-      font-size: 20px;
-      border: none;
-      border-radius: 15px;
-      cursor: pointer;
+      outline: none;
       transition: 0.3s;
-      box-shadow: 0 0 12px rgba(30, 144, 255, 0.6);
+      box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.2);
     }
 
-    button:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 16px rgba(30, 144, 255, 0.9);
-    }
-
-    /* Emergency Stop Button */
-    #stopBtn {
-      background: linear-gradient(135deg, #ff0000, #ff4d4d);
-      box-shadow: 0 0 18px rgba(255, 80, 80, 0.9);
-    }
-
-    #stopBtn:hover {
-      box-shadow: 0 0 25px rgba(255, 80, 80, 1);
-      transform: scale(1.12);
-    }
-  </style>
-</head>
-
-<body>
-
-  <h1>RADAR TURRET CONTROLLER</h1>
-
-  <div class="card">
-    <form action="/set_zero.php" method="POST">
-      <label for="turret">Turret Number:</label>
-      <input type="number" id="turret" name="turret" min="1" max="10" required />
-
-      <label for="zero_angle">Zero Angle (degrees):</label>
-      <input type="number" id="zero_angle" name="zero_angle" required />
-
-      <button id="submitBtn" type="submit">SET ZERO POSITION</button>
-    </form>
-
-    <!-- EMERGENCY STOP -->
-    <button type="button" id="stopBtn" onclick="emergencyStop()">EMERGENCY STOP</button>
-
-    <!-- FORM FOR RUN SIGNAL -->
-    <form action="/start_run.php" method="POST">
-      <input type="hidden" name="run_signal" id="run_signal" value="false">
-
-      <button type="submit"
-              id="runBtn"
-              onclick="document.getElementById('run_signal').value = 'true';">
-        INITIATE RUN
-      </button>
-    </form>
-
-  </div>
-
-  <script>
-    function emergencyStop() {
-      fetch("/emergency_stop.php", { method: "POST" });
-      alert("EMERGENCY STOP ACTIVATED!");
-    }
-  </script>
-
-</body>
-</html>
+    input
 
     """
     return bytes(html,'utf-8')
