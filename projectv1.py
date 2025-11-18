@@ -218,6 +218,9 @@ def web_page():
 
       <button id="submitBtn" type="submit">SET ZERO POSITION</button>
 
+      <!-- ⭐ NEW BUTTON ⭐ -->
+      <button type="button" id="runBtn" onclick="startRun()">INITIATE RUN</button>
+
     </form>
   </div>
 
@@ -249,6 +252,12 @@ def web_page():
 
     altitudeInput.addEventListener("input", validateForm);
     azimuthInput.addEventListener("input", validateForm);
+
+    // ⭐ Placeholder function — customize as needed
+    function startRun() {
+      alert("Run initiated! (Replace this with your real function)");
+      // You can call fetch("/start_run.php") or anything you need here
+    }
   </script>
 
 </body>
@@ -278,8 +287,7 @@ def server_web_page():         ##
         message = conn.recv(1024).decode('utf-8')              
         print(f'Message from {client_ip}')   
         data_dict = parsePOSTdata(message)
-        print(data_dict)
-        if data_dict: #Skips the first GET, and only runs the code updating golbal variables
+        if data_dict: #Skips the first GET, and only runs the code after pressing the set zero on the user end
             print(data_dict)
             print("Not ready yet")
         conn.send(b'HTTP/1.1 200 OK\r\n')          
