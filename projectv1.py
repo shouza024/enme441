@@ -278,6 +278,7 @@ def server_web_page():         ##
         message = conn.recv(1024).decode('utf-8')              
         print(f'Message from {client_ip}')   
         data_dict = parsePOSTdata(message)
+        print(data_dict)
         if data_dict: #Skips the first GET, and only runs the code updating golbal variables
             print(data_dict)
             print("Not ready yet")
