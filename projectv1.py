@@ -279,7 +279,7 @@ def server_web_page():         ##
         print(f'Message from {client_ip}')   
         data_dict = parsePOSTdata(message)
         if 'azimith' in data_dict and 'altitude' in data_dict: #Skips the first GET, and only runs the code updating golbal variables
-            print(data_dict['azimith'])
+            print(data_dict)
             print("Not ready yet")
         conn.send(b'HTTP/1.1 200 OK\r\n')          
         conn.send(b'Content-type: text/html\r\n') 
