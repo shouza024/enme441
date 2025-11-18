@@ -154,7 +154,128 @@ def web_page():
       box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.2);
     }
 
-    input
+    input[type="text"]:focus {
+      border-color: #00eaff;
+      box-shadow: 0 0 12px rgba(0, 255, 255, 0.6);
+    }
+
+    .error {
+      font-size: 13px;
+      color: #ff6b6b;
+      margin-top: 5px;
+      min-height: 16px;
+      text-shadow: 0 0 5px #ff3b3b;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      font-size: 18px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 10px;
+      background: linear-gradient(135deg, #0047ff, #00eaff);
+      color: white;
+      font-weight: bold;
+      letter-spacing: 2px;
+      box-shadow: 0 0 15px rgba(0, 160, 255, 0.7);
+      transition: 0.25s;
+    }
+
+    button:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 25px rgba(0, 220, 255, 1);
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div class="calibration-card">
+    <h2>LASER TURRET CALIBRATION</h2>
+
+    <!-- MAIN CALIBRATION FORM -->
+    <form id="calibrationForm" action="/set_zero.php" method="POST">
+      
+      <div class="input-row">
+        <label for="altitude">Altitude Angle:</label>
+        <input type="text" id="altitude" name="altitude" placeholder="Enter altitude offset">
+        <div id="altitudeError" class="error"></div>
+      </div>
+
+      <div class="input-row">
+        <label for="azimuth">Azimuth Angle:</label>
+        <input type="text" id="azimuth" name="azimuth" placeholder="Enter azimuth offset">
+        <div id="azimuthError" class="error"></div>
+      </div>
+
+      <button id="submitBtn" type="submit">SET ZERO POSITION</button>
+
+    </form>
+
+    <!-- NEW FORM FOR RUN + STOP -->
+    <form action="/turret_control.php" method="POST">
+
+      <input type="hidden" id="run_signal" name="run_signal" value="false">
+      <input type="hidden" id="stop_signal" name="stop_signal" value="false">
+
+      <button type="submit" onclick="
+        document.getElementById('run_signal').value='true';
+        document.getElementById('stop_signal').value='false';
+      ">
+        INITIATE RUN
+      </button>
+
+      <button type="submit" onclick="
+        document.getElementById('stop_signal').value='true';
+        document.getElementById('run_signal').value='false';
+      ">
+        EMERGENCY STOP
+      </button>
+
+    </form>
+  </div>
+
+
+  <script>
+    const altitudeInput = document.getElementById("altitude");
+    const azimuthInput = document.getElementById("azimuth");
+    const altitudeError = document.getElementById("altitudeError");
+    const azimuthError = document.getElementById("azimuthError");
+    const submitBtn = document.getElementById("submitBtn");
+
+    function validateAngle(value) {
+      if (value === "") return "Field cannot be empty.";
+      if (isNaN(value)) return "Angle must be a number.";
+      const num = Number(value);
+      if (num < -180 || num > 180) return "Angle must be between -180° and 180°.";
+      return "";
+    }
+
+    function validateForm() {
+      const altErr = validateAngle(altitudeInput.value);
+      const aziErr = validateAngle(azimuthInput.value);
+
+      altitudeError.textContent = altErr;
+      azimuthError.textContent = aziErr;
+
+      submitBtn.disabled = altErr || aziErr;
+    }
+
+    altitudeInput.addEventListener("input", validateForm);
+    azimuthInput.addEventListener("input", validateForm);
+  </script>
+
+</body>
+</html>
 
     """
     return bytes(html,'utf-8')
