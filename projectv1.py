@@ -108,8 +108,101 @@ def web_page():
       padding: 25px;
       margin: 40px auto;
       width: 85%;
+      max-width: 600px;
+      border-radius: 20px;
+      box-shadow: 0 0 35px rgba(0, 191, 255, 0.4);
+    }
 
- 
+    label {
+      display: block;
+      margin-top: 15px;
+      font-size: 18px;
+    }
+
+    input[type="number"] {
+      width: 80%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 18px;
+      text-align: center;
+    }
+
+    button {
+      margin-top: 25px;
+      padding: 15px 30px;
+      background: linear-gradient(135deg, #1e90ff, #00bfff);
+      color: white;
+      font-weight: bold;
+      font-size: 20px;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 0 12px rgba(30, 144, 255, 0.6);
+    }
+
+    button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 16px rgba(30, 144, 255, 0.9);
+    }
+
+    /* Emergency Stop Button */
+    #stopBtn {
+      background: linear-gradient(135deg, #ff0000, #ff4d4d);
+      box-shadow: 0 0 18px rgba(255, 80, 80, 0.9);
+    }
+
+    #stopBtn:hover {
+      box-shadow: 0 0 25px rgba(255, 80, 80, 1);
+      transform: scale(1.12);
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>RADAR TURRET CONTROLLER</h1>
+
+  <div class="card">
+    <form action="/set_zero.php" method="POST">
+      <label for="turret">Turret Number:</label>
+      <input type="number" id="turret" name="turret" min="1" max="10" required />
+
+      <label for="zero_angle">Zero Angle (degrees):</label>
+      <input type="number" id="zero_angle" name="zero_angle" required />
+
+      <button id="submitBtn" type="submit">SET ZERO POSITION</button>
+    </form>
+
+    <!-- EMERGENCY STOP -->
+    <button type="button" id="stopBtn" onclick="emergencyStop()">EMERGENCY STOP</button>
+
+    <!-- FORM FOR RUN SIGNAL -->
+    <form action="/start_run.php" method="POST">
+      <input type="hidden" name="run_signal" id="run_signal" value="false">
+
+      <button type="submit"
+              id="runBtn"
+              onclick="document.getElementById('run_signal').value = 'true';">
+        INITIATE RUN
+      </button>
+    </form>
+
+  </div>
+
+  <script>
+    function emergencyStop() {
+      fetch("/emergency_stop.php", { method: "POST" });
+      alert("EMERGENCY STOP ACTIVATED!");
+    }
+  </script>
+
+</body>
+</html>
+
     """
     return bytes(html,'utf-8')
 
