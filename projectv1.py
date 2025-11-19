@@ -4,14 +4,25 @@ import RPi.GPIO as GPIO
 import requests
 import json
 import socket
-import stepper_class
+from stepper_class import Stepper
 import threading
+from shifter import Shifter
 
 #-------------------Global Variables---------------------------
-turret=[]   #list
-globe=[]    #list
-azimuth=0    #rad
-altitude=0  #rad
+turret=[]             #list
+globe=[]              #list
+azimuth_input=0       #rad 
+altitude_input=0      #rad
+run_signal=0          #boolean      
+stop_signal=0         #boolean      
+
+#------------------Global Objects--------------------------------
+s = Shifter(data=16,latch=20,clock=21)   
+lock = multiprocessing.Lock()
+
+# Instantiate 2 Steppers:
+m2 = Stepper(s, lock)   #will control azimuth
+m1 = Stepper(s, lock)   #will control altitude
 
 #------------------Server running with json file------------------------------
 data ={
@@ -73,6 +84,41 @@ def parse_json():
     #globe[id][r,theta,z] How to find any values from the json file
     #print(turret[1][1]) #Print turret radius of turret id 1.
 
+#-----------------Control function Base on the data_dict read into-----------------------------
+def update(data_dict): # updates global variable base on what is found in the data_dict
+    global run_signal, stop_signal,azimuth_input, altitude_input
+    if 'run_signal' in data_dict:
+        run_signal = data_dict['run_signal'] 
+        if run_signal==True:
+          initiate()
+    if 'stop_signal' in data_dict:
+        stop_signal = data_dict['stop_signal']
+        if run_signal==True:
+          stopping()
+    if 'azimuth' in data_dict:
+        azimuth_input = data_dict['azimuth']
+        altitude_input= data_dict['altitude']
+        set_zero(azimuth_input,altitude_input)
+      
+def initiate():         #This function will parse the json file initate calculating route, and then perform 
+    print("initiate run") 
+    #Code that finds path
+
+
+def stopping():         #Stops any motion, honestly not sure how do this yet? Is this required?
+    print('stop')
+
+def set_zero(azimuth,altitude):
+    print('moving to new desire zero')
+    global m1,m2
+    p2 = m2.goAngle(azimuth)
+    p1 = m1.goAngle(altitude)
+    p1.join()
+    print(f'moving m1 to {altitude}')
+    print(f"moving m2 to {azimuth}")
+    p2.join()
+    m1.zero()
+    m2.zer()
 
 
 
@@ -301,8 +347,8 @@ def server_web_page():         ##
         print(f'Message from {client_ip}')   
         data_dict = parsePOSTdata(message)
         if data_dict: #Skips the first GET, and only runs the code after pressing the set zero on the user end
-            print(data_dict)
-            print("Not ready yet")
+            update(data_dict)
+            print('pi updating base on ur input')
         conn.send(b'HTTP/1.1 200 OK\r\n')          
         conn.send(b'Content-type: text/html\r\n') 
         conn.send(b'Connection: close\r\n\r\n') 
