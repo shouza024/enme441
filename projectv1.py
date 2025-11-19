@@ -25,6 +25,7 @@ m2 = Stepper(s, lock)   #will control azimuth
 m1 = Stepper(s, lock)   #will control altitude
 
 #------------------Server running with json file------------------------------
+'''
 data ={
  "turrets": {
  "1": {"r": 300.0, "theta": 2.580 },
@@ -59,11 +60,11 @@ def run_server():
 
     conn.close()
     server.close()
-
+'''
 
 
 #-------------------Parsing Json-------------------------------
-url = "http://10.112.150.68:4084" #INSERT URL WHEN RELEASED
+url = "http://192.168.1.254:8000/positions.json" #INSERT URL WHEN RELEASED
 
 def parse_json():
     
@@ -124,7 +125,7 @@ def set_zero(azimuth,altitude):
     print(f"moving m2 to {azimuth}")
     p2.join()
     m1.zero()
-    m2.zer0()
+    m2.zero()
 
 
 
