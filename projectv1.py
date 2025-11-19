@@ -89,11 +89,11 @@ def parse_json():
 def update(data_dict): # updates global variable base on what is found in the data_dict
     global run_signal, stop_signal,azimuth_input, altitude_input
     if 'run_signal' in data_dict:
-        run_signal = data_dict['run_signal'] 
+        run_signal = bool(data_dict['run_signal'])
         if run_signal==True:
           initiate()
     if 'stop_signal' in data_dict:
-        stop_signal = data_dict['stop_signal']
+        stop_signal = bool(data_dict['stop_signal'])
         if run_signal==True:
           stopping()
     if 'azimuth' in data_dict:
