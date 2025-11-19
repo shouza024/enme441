@@ -127,8 +127,8 @@ if __name__ == '__main__':
     p2.join()
 
     # Next — m1 keeps going while m2 reverses direction
-    p1 = m1.goAngle(-90)
-    p2 = m2.goAngle(90)
+    p1 = m1.goAngle(0)
+    p2 = m2.goAngle(0)
     p1.join()
     p2.join()
     
