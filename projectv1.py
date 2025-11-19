@@ -372,11 +372,10 @@ s.listen(3)
 
 web_page_thread = threading.Thread(target=server_web_page)
 web_page_thread.daemon = True
-'''
+
 server_thread = threading.Thread(target=run_server)
 server_thread.daemon = True
 server_thread.start()
-'''
 web_page_thread.start()
 
 time.sleep(1)
