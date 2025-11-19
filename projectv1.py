@@ -96,8 +96,8 @@ def update(data_dict): # updates global variable base on what is found in the da
         if run_signal==True:
           stopping()
     if 'azimuth' in data_dict:
-        azimuth_input = data_dict['azimuth']
-        altitude_input= data_dict['altitude']
+        azimuth_input = float(data_dict['azimuth'])
+        altitude_input= float(data_dict['altitude'])
         set_zero(azimuth_input,altitude_input)
       
 def initiate():         #This function will parse the json file initate calculating route, and then perform 
