@@ -104,8 +104,12 @@ def initiate():         #This function will parse the json file initate calculat
     #Code that finds path
     global turret, globe, parse_json
     parse_json()
+    print("Turret list")
     print(turret)
+    print("Globe list")
     print(globe)
+
+
 
 
 
@@ -347,7 +351,7 @@ def server_web_page():         ##
     while True:
         time.sleep(0.5)
         print('waiting on connection html')
-        conn,(client_ip,client_port) = s.accept()
+        conn,(client_ip,client_port) = d.accept()
         message = conn.recv(1024).decode('utf-8')              
         print(f'Message from {client_ip}')   
         data_dict = parsePOSTdata(message)
@@ -366,9 +370,9 @@ def server_web_page():         ##
 #------------------------Socket Setup----------------------------
 
 
-s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-s.bind(('',8084))
-s.listen(3)
+d = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+d.bind(('',8084))
+d.listen(3)
 
 web_page_thread = threading.Thread(target=server_web_page)
 web_page_thread.daemon = True
