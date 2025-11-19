@@ -124,7 +124,7 @@ def set_zero(azimuth,altitude):
     print(f"moving m2 to {azimuth}")
     p2.join()
     m1.zero()
-    m2.zer()
+    m2.zer0()
 
 
 
