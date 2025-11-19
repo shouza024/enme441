@@ -25,7 +25,6 @@ m2 = Stepper(s, lock)   #will control azimuth
 m1 = Stepper(s, lock)   #will control altitude
 
 #------------------Server running with json file------------------------------
-'''
 data ={
  "turrets": {
  "1": {"r": 300.0, "theta": 2.580 },
@@ -60,17 +59,16 @@ def run_server():
 
     conn.close()
     server.close()
-'''
 
 
 #-------------------Parsing Json-------------------------------
-url = "http://192.168.1.254:8000/positions.json" #INSERT URL WHEN RELEASED
-
+url = "http://10.112.150.68:4084" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
+    #"http://192.168.1.254:8000/positions.json"
 def parse_json():
     
     response = requests.get(url)
     response.raise_for_status() 
-    data = response.json()
+    data = response.json()#utf8
     print("json filed parsed and copied")
     '''
     #This code parse the example.json file, only use while in testing
