@@ -84,7 +84,7 @@ def parse_json():
     #globe[id][r,theta,z] How to find any values from the json file
     #print(turret[1][1]) #Print turret radius of turret id 1.
 
-#-----------------Control function Base on the data_dict read into-----------------------------
+#-----------------Control function Base on the data_dict read into Pi-----------------------------
 def update(data_dict): # updates global variable base on what is found in the data_dict
     global run_signal, stop_signal,azimuth_input, altitude_input
     if 'run_signal' in data_dict:
@@ -103,6 +103,12 @@ def update(data_dict): # updates global variable base on what is found in the da
 def initiate():         #This function will parse the json file initate calculating route, and then perform 
     print("initiate run") 
     #Code that finds path
+    global turret, globe, parse_json
+    parse_json()
+    print(turret)
+    print(globe)
+
+
 
 
 def stopping():         #Stops any motion, honestly not sure how do this yet? Is this required?
@@ -372,7 +378,6 @@ server_thread.daemon = True
 web_page_thread.start()
 server_thread.start()
 time.sleep(1)
-parse_json()
 
 
 
