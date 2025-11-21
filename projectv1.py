@@ -14,7 +14,9 @@ globe=[]              #list
 azimuth_input=0       #rad 
 altitude_input=0      #rad
 run_signal=0          #boolean      
-stop_signal=0         #boolean      
+stop_signal=0         #boolean   
+r_position=0          #cm robot radius position   
+theta_position =0     #def
 
 #------------------Global Objects--------------------------------
 s = Shifter(data=16,latch=20,clock=21)   
@@ -60,6 +62,10 @@ def run_server():
     conn.close()
     server.close()
 
+def angular_diff(a, b):
+    d = abs(a - b) % (360)
+    return min(d, 360 - d)
+
 
 #-------------------Parsing Json-------------------------------
 url = "http://10.112.150.68:4084" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
@@ -102,20 +108,38 @@ def update(data_dict): # updates global variable base on what is found in the da
 def initiate():         #This function will parse the json file initate calculating route, and then perform 
     print("initiate run") 
     #Code that finds path
-    global turret, globe, parse_json
+    global turret, globe, parse_json,r_position,theta_position
     parse_json()
     print("Turret list")
     print(turret)
     print("Globe list")
     print(globe)
+    r_position = turret[n][0]
+    theta_position=turret[n][1] #assuming that n is id the turrent corresponding to our location, dont know yet how we are getting this value
 
-
-
+    #-----------------Sort order of globe to aim--------------------------
+    sort_globe = globe.sort(key=lambda g: g[1])     #Sorted the globe list from highest to lowest globe
+    delta_globe_turret_position=[]      #need to find best direction to sweep, which globe is closer the one on its left or right?
+    m=360
+    for i in sort_globe[i]:
+        if m > angular_diff(sort_globe[i][1],theta_position):
+            id_closet_globe = i
+            g=abs(theta_position-sort_globe[i][1])
+            if g < 360-g:
+                sweep_direction = 1 #CCW
+            elif g> 360-g:
+                sweep_direction=-1 #CW    #might need to flip these direction, depends on stepper mottor class
+    
+    globe_target_sequence =[]
+    
+    
+    
 
 
 
 def stopping():         #Stops any motion, honestly not sure how do this yet? Is this required?
     print('stop')
+    
 
 def set_zero(azimuth,altitude):
     print('moving to new desire zero')

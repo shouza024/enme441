@@ -7,6 +7,7 @@ import time
 import multiprocessing
 from multiprocessing import Value
 from shifter import Shifter  # custom Shifter class
+import math
 
 
 class Stepper:
@@ -80,6 +81,7 @@ class Stepper:
         p = multiprocessing.Process(target=self.__rotate, args=(delta,))
         p.start()
         return p # wait for rotation to complete before continuing
+    
     # ===== Absolute rotation =====
     def goAngle(self, target_angle):
         current = self.angle.value
