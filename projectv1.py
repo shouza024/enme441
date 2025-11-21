@@ -7,6 +7,7 @@ import socket
 from stepper_class import Stepper
 import threading
 from shifter import Shifter
+import math
 
 #-------------------Global Variables---------------------------
 turret=[]             #list
@@ -62,10 +63,36 @@ def run_server():
     conn.close()
     server.close()
 
-def angular_diff(a, b):
-    d = abs(a - b) % (360)
-    return min(d, 360 - d)
+def angle_diff(target_rad, current_rad):
+    diff = (target_rad - current_rad + math.pi) % (2 * math.pi) - math.pi
+    return diff
 
+def turret_altitude(target_coord,turret_coord):
+    """
+    turret, target: [r, theta, z] in radians and same radius
+    Returns signed pitch rotation (rad) to aim at target
+    """
+    r_t, theta_t, z_t = turret_coord
+    r_p, theta_p, z_p = target_coord
+    
+    # horizontal distance
+    delta_theta = angle_diff(theta_p, theta_t)
+    dh = 2 * r_t * math.sin(delta_theta / 2)
+    
+    # vertical difference
+    dz = z_p - z_t
+    
+    # signed pitch angle
+    altitude = math.atan2(dz, dh)
+    return (altitude)
+
+def go_next(self,target_coordinates,turret_coordinates):
+        #target_coordinates - list contain [radians, theta, zeta]
+        #turret_coordinates - list contains [radians, theta, zeta] zeta might be decide by our cad model, when we get around to that
+        angle_delta =angle_diff(target_coordinates[1],turret_coordinates[1])
+        turret_azimuth_angle =(angle_delta-math.pi)/2
+        turret_altitude_angle=turret_altitude(target_coordinates,turret_coordinates)
+        return [turret_azimuth_angle,turret_altitude_angle]
 
 #-------------------Parsing Json-------------------------------
 url = "http://10.112.150.68:4084" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
@@ -114,28 +141,58 @@ def initiate():         #This function will parse the json file initate calculat
     print(turret)
     print("Globe list")
     print(globe)
+    n=1                         #assuming that n is our turret position
     r_position = turret[n][0]
     theta_position=turret[n][1] #assuming that n is id the turrent corresponding to our location, dont know yet how we are getting this value
+    z_position = 3              #centimeters of the ground, not sure what this is until cad is fleshed out
 
     #-----------------Sort order of globe to aim--------------------------
     sort_globe = globe.sort(key=lambda g: g[1])     #Sorted the globe list from highest to lowest globe
-    delta_globe_turret_position=[]      #need to find best direction to sweep, which globe is closer the one on its left or right?
-    m=360
+    sort_turret= turret.sort(key=lambda t: t[1])
+    globe_target_sequence=[]
+    #need to find best direction to sweep, which globe is closer the one on its left or right?
     for i in sort_globe[i]:
-        if m > angular_diff(sort_globe[i][1],theta_position):
+        if 360 > angular_diff(sort_globe[i][1],theta_position):
             id_closet_globe = i
             g=abs(theta_position-sort_globe[i][1])
-            if g < 360-g:
-                sweep_direction = 1 #CCW
-            elif g> 360-g:
-                sweep_direction=-1 #CW    #might need to flip these direction, depends on stepper mottor class
-    
-    globe_target_sequence =[]
-    
-    
-    
+                                                   
+    if g < 360-g:
+        sweep_direction = 1 #CW
+        globe_target_sequence = sort_globe[id_closet_globe:] + sort_globe[:id_closet_globe]
+        sort_turret_inv = sort_turret[::-1]
+        last_globe=globe_target_sequence[-1]      #variable holds position of the final globe in aim sequence 
+        starting_id_turret=min(range(len(sort_turret_inv)),key=lambda i:abs(sort_turret_inv[i][1]-last_globe[1]))
+        turret_target_sequence =sort_turret_inv[starting_id_turret:]+sort_turret_inv[:starting_id_turret]
+    elif g> 360-g:
+        sweep_direction=-1 #CCW    #might need to flip these direction, depends on stepper mottor class
+        sort_globe_inv=sort_globe[::-1] #Inverse sort globe list to now be from high to low
+        globe_target_sequence = sort_globe[id_closet_globe:] + sort_globe[:id_closet_globe]
+        last_globe=globe_target_sequence[-1]
+        starting_id_turret=min(range(len(sort_turret)),key=lambda i:abs(sort_turret[i][1]-last_globe[1]))
+        turret_target_sequence =sort_turret_inv[starting_id_turret:]+sort_turret_inv[:starting_id_turret]
+    #This block of code above is kinda confusing but all it does is output two important list:
+    #turret_target_sequence - sequence to aim for turrets
+    #globe_target_sequence - sequence for globe, both sequence will be completed by sweeping in one direction initially,
+    #but then will sweep the other direction to hit the turrets along the way back.
 
+    #------------------------Code that moves the turret along the two sequence above-----------------------------------
+    #First we will follow the globe sequence, assuming that the turret is setup to aim at the zero, we will move in that sequence
+    for i in globe_target_sequence:
+        turret_azimuth_angle,turret_altitude_angle=go_next(globe_target_sequence[i],[r_position,theta_position,z_position])
+        p1= m1.goAngle(turret_azimuth_angle)
+        p2= m2.goAngle(turret_altitude_angle)
+        p1.join()
+        p2.join()
 
+    for z in turret_target_sequence:
+        if theta_position==turret_target_sequence[z][1]:  #Skips the turret position corresponding to our turret
+          continue
+        turret_azimuth_angle,turret_altitude_angle=go_next(turret_target_sequence[z],[r_position,theta_position,z_position])
+        p1= m1.goAngle(turret_azimuth_angle)
+        p2= m2.goAngle(turret_altitude_angle)
+        p1.join()
+        p2.join()
+    
 
 def stopping():         #Stops any motion, honestly not sure how do this yet? Is this required?
     print('stop')
