@@ -184,7 +184,7 @@ def initiate():         #This function will parse the json file initate calculat
         p2= m2.goAngle(turret_altitude_angle)
         p1.join()
         p2.join()
-        print(f"aiming for globe#{z}")
+        print(f"aiming for globe#{i}")
 
     for z,turret in enumerate(turret_target_sequence):
         if theta_position==turret[1]:  #Skips the turret position corresponding to our turret
