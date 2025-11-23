@@ -184,17 +184,18 @@ def initiate():         #This function will parse the json file initate calculat
         p2= m2.goAngle(turret_altitude_angle)
         p1.join()
         p2.join()
-        print("Check ur motors")
+        print(f"aiming for globe#{z}")
 
     for z,turret in enumerate(turret_target_sequence):
         if theta_position==turret[1]:  #Skips the turret position corresponding to our turret
           continue
-        turret_azimuth_angle,turret_altitude_angle=go_next(turret,[r_position,theta_position,z_position])
+        turret_including_z=turret+[0]   #this zero will probably be some z offset variable
+        turret_azimuth_angle,turret_altitude_angle=go_next(turret_including_z,[r_position,theta_position,z_position])
         p1= m1.goAngle(turret_azimuth_angle)
         p2= m2.goAngle(turret_altitude_angle)
         p1.join()
         p2.join()
-        print("Check ur motors again")
+        print(f"aiming other turret #{z}")
     
 
 def stopping():         #Stops any motion, honestly not sure how do this yet? Is this required?
