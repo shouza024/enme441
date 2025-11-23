@@ -152,7 +152,7 @@ def initiate():         #This function will parse the json file initate calculat
     globe_target_sequence=[]
     #need to find best direction to sweep, which globe is closer the one on its left or right?
     for i in sort_globe:
-        if 360 > angular_diff(sort_globe[i][1],theta_position):
+        if 360 > angular_diff(sort_globe[i][1],theta_position): 
             id_closet_globe = i
             g=abs(theta_position-sort_globe[i][1])
                                                    
