@@ -178,17 +178,17 @@ def initiate():         #This function will parse the json file initate calculat
 
     #------------------------Code that moves the turret along the two sequence above-----------------------------------
     #First we will follow the globe sequence, assuming that the turret is setup to aim at the zero, we will move in that sequence
-    for i in globe_target_sequence:
-        turret_azimuth_angle,turret_altitude_angle=go_next(globe_target_sequence[i],[r_position,theta_position,z_position])
+    for i,globe in enumerate(globe_target_sequence):
+        turret_azimuth_angle,turret_altitude_angle=go_next(globe,[r_position,theta_position,z_position])
         p1= m1.goAngle(turret_azimuth_angle)
         p2= m2.goAngle(turret_altitude_angle)
         p1.join()
         p2.join()
 
-    for z in turret_target_sequence:
-        if theta_position==turret_target_sequence[z][1]:  #Skips the turret position corresponding to our turret
+    for z,turret in enumerate(turret_target_sequence):
+        if theta_position==turret[1]:  #Skips the turret position corresponding to our turret
           continue
-        turret_azimuth_angle,turret_altitude_angle=go_next(turret_target_sequence[z],[r_position,theta_position,z_position])
+        turret_azimuth_angle,turret_altitude_angle=go_next(turret,[r_position,theta_position,z_position])
         p1= m1.goAngle(turret_azimuth_angle)
         p2= m2.goAngle(turret_altitude_angle)
         p1.join()
