@@ -147,12 +147,12 @@ def initiate():         #This function will parse the json file initate calculat
     z_position = 3              #centimeters of the ground, not sure what this is until cad is fleshed out
 
     #-----------------Sort order of globe to aim--------------------------
-    sort_globe = globe.sort(key=lambda g: g[1])     #Sorted the globe list from highest to lowest globe
-    sort_turret= turret.sort(key=lambda t: t[1])
+    sort_globe = sorted(globe, key=lambda g: g[1])    #Sorted the globe list from highest to lowest globe
+    sort_turret= sorted(turret, key=lambda t: t[1])
     globe_target_sequence=[]
     #need to find best direction to sweep, which globe is closer the one on its left or right?
     for i in sort_globe:
-        if 360 > angular_diff(sort_globe[i][1],theta_position): 
+        if 360 > angle_diff(sort_globe[i][1],theta_position): 
             id_closet_globe = i
             g=abs(theta_position-sort_globe[i][1])
                                                    
