@@ -86,7 +86,7 @@ def turret_altitude(target_coord,turret_coord):
     altitude = math.atan2(dz, dh)
     return (altitude)
 
-def go_next(self,target_coordinates,turret_coordinates):
+def go_next(target_coordinates,turret_coordinates):
         #target_coordinates - list contain [radians, theta, zeta]
         #turret_coordinates - list contains [radians, theta, zeta] zeta might be decide by our cad model, when we get around to that
         angle_delta =angle_diff(target_coordinates[1],turret_coordinates[1])
