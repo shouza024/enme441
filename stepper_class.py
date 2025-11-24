@@ -73,7 +73,10 @@ class Stepper:
         for _ in range(numSteps):
             self.__step(dir)
             time.sleep(Stepper.delay / 1e6)
-        status.done = True
+            
+        if status is not None:
+            status.done = True
+        print("Command complete")
 
     # ===== Public rotate =====
     def rotate(self, delta, status):
@@ -84,7 +87,7 @@ class Stepper:
         return p # wait for rotation to complete before continuing
     
     # ===== Absolute rotation =====
-    def goAngle(self, target_angle, status):
+    def goAngle(self, target_angle, status=None):
         current = self.angle.value
         delta = target_angle - current
 

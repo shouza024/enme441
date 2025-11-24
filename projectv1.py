@@ -86,13 +86,13 @@ def turret_altitude(target_coord,turret_coord):
     altitude = math.atan2(dz, dh)
     return (altitude)
 
-def go_next(target_coordinates,turret_coordinates):
-        #target_coordinates - list contain [radians, theta, zeta]
-        #turret_coordinates - list contains [radians, theta, zeta] zeta might be decide by our cad model, when we get around to that
-        angle_delta =angle_diff(target_coordinates[1],turret_coordinates[1])
-        turret_azimuth_angle =(angle_delta-math.pi)/2
-        turret_altitude_angle=turret_altitude(target_coordinates,turret_coordinates)
-        return [turret_azimuth_angle,turret_altitude_angle]
+def get_angles(target_coordinates,turret_coordinates):
+  #target_coordinates - list contain [radians, theta, zeta]
+  #turret_coordinates - list contains [radians, theta, zeta] zeta might be decide by our cad model, when we get around to that
+  angle_delta = angle_diff(target_coordinates[1],turret_coordinates[1])
+  turret_azimuth_angle = (angle_delta-math.pi)/2
+  turret_altitude_angle= turret_altitude(target_coordinates,turret_coordinates)
+  return [turret_azimuth_angle,turret_altitude_angle]
 
 #-------------------Parsing Json-------------------------------
 url = "http://10.217.24.68:4084" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
@@ -187,8 +187,16 @@ def initiate():         #This function will parse the json file initate calculat
         for st in s:
             print(st.done)
 
+
+    prev = time.time()
+    tracker = 0.0
     for i,globe in enumerate(globe_target_sequence):
-        turret_azimuth_angle,turret_altitude_angle=go_next(globe,[r_position,theta_position,z_position])
+        now = time.time()
+        dt = now - prev
+        prev = now
+        turret_azimuth_angle,turret_altitude_angle=get_angles(globe,[r_position,theta_position,z_position])
+        print(f"Azimuth: {turret_azimuth_angle}")
+        print(f"Altitude: {turret_altitude_angle}")
         statuses = statuses_[i]
         p1= m1.goAngle(turret_azimuth_angle, statuses[0])
         p2= m2.goAngle(turret_altitude_angle, statuses[1])
@@ -197,14 +205,15 @@ def initiate():         #This function will parse the json file initate calculat
         print(f"aiming for globe#{i}")
 
         while sum([status.done for status in statuses]) < 2:
-            print("we are waiting")
+          pass
+        print(f"Globe {i} completed")
             
 
     for z,turret in enumerate(turret_target_sequence):
         if theta_position==turret[1]:  #Skips the turret position corresponding to our turret
           continue
         turret_including_z=turret+[0]   #this zero will probably be some z offset variable
-        turret_azimuth_angle,turret_altitude_angle=go_next(turret_including_z,[r_position,theta_position,z_position])
+        turret_azimuth_angle,turret_altitude_angle=get_angles(turret_including_z,[r_position,theta_position,z_position])
         p1= m1.goAngle(turret_azimuth_angle)
         p2= m2.goAngle(turret_altitude_angle)
         p1.join()
