@@ -28,6 +28,7 @@ m2 = Stepper(s, lock)   #will control azimuth
 m1 = Stepper(s, lock)   #will control altitude
 
 #------------------Server running with json file------------------------------
+'''
 data ={
  "turrets": {
  "1": {"r": 300.0, "theta": 2.580 },
@@ -66,6 +67,7 @@ def run_server():
 
     conn.close()
     server.close()
+'''
 
 def angle_diff(target_rad, current_rad):
     diff = (target_rad - current_rad + math.pi) % (2 * math.pi) - math.pi
@@ -99,7 +101,7 @@ def go_next(target_coordinates,turret_coordinates):
         return [turret_azimuth_angle,turret_altitude_angle]
 
 #-------------------Parsing Json-------------------------------
-url = "http://10.217.24.68:4084" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
+url = "http://192.168.1.254:8000/positions.json" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
     #"http://192.168.1.254:8000/positions.json"
 def parse_json():
     
