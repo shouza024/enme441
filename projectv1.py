@@ -179,7 +179,7 @@ def initiate():         #This function will parse the json file initate calculat
     #------------------------Code that moves the turret along the two sequence above-----------------------------------
     #First we will follow the globe sequence, assuming that the turret is setup to aim at the zero, we will move in that sequence
     class StepperStatus:
-        def init(self):
+        def __init__(self):
             self.done = False
     
     statuses_ = [[StepperStatus() for _ in range(2)] for _ in globe]
