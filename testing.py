@@ -111,6 +111,7 @@ def parse_json():
     global turret, globe
     turret = [[id['r'],id['theta']] for id in data['turrets'].values()]
     globe  = [[i['r'],i['theta'],i['z']] for i in data['globes']]
+    
 
     #turret[id][r,theta] 
     #globe[id][r,theta,z] How to find any values from the json file
@@ -180,8 +181,8 @@ def initiate():         #This function will parse the json file initate calculat
     #First we will follow the globe sequence, assuming that the turret is setup to aim at the zero, we will move in that sequence
     for i,globe in enumerate(globe_target_sequence):
         turret_azimuth_angle,turret_altitude_angle=go_next(globe,[r_position,theta_position,z_position])
-        p1= m1.goAngle(turret_azimuth_angle)
-        p2= m2.goAngle(turret_altitude_angle)
+        p1= m1.goAngle(turret_azimuth_angle*180/math.pi)
+        p2= m2.goAngle(turret_altitude_angle*180/math.pi)
         p1.join()
         p2.join()
         print(f"aiming for globe#{i}")
@@ -192,8 +193,8 @@ def initiate():         #This function will parse the json file initate calculat
           continue
         turret_including_z=turret+[0]   #this zero will probably be some z offset variable
         turret_azimuth_angle,turret_altitude_angle=go_next(turret_including_z,[r_position,theta_position,z_position])
-        p1= m1.goAngle(turret_azimuth_angle)
-        p2= m2.goAngle(turret_altitude_angle)
+        p1= m1.goAngle(turret_azimuth_angle*180/math.pi)
+        p2= m2.goAngle(turret_altitude_angle*180/math.pi)
         p1.join()
         p2.join()
         print(f"aiming other turret #{z}")
