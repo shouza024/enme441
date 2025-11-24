@@ -178,15 +178,21 @@ def initiate():         #This function will parse the json file initate calculat
 
     #------------------------Code that moves the turret along the two sequence above-----------------------------------
     #First we will follow the globe sequence, assuming that the turret is setup to aim at the zero, we will move in that sequence
+    class StepperStatus:
+        def init(self):
+            self.done = False
+    
+    statuses = [[StepperStatus() for _ in range(2)] for _ in globe]
+
     for i,globe in enumerate(globe_target_sequence):
-        turret_azimuth_angle,turret_altitude_angle=go_next(globe,[r_position,theta_position,z_position])
-        p1= m1.goAngle(turret_azimuth_angle)
-        p2= m2.goAngle(turret_altitude_angle)
+        turret_azimuth_angle,turret_altitude_angle, statuses=go_next(globe,[r_position,theta_position,z_position, statuses])
+        p1= m1.goAngle(turret_azimuth_angle, statuses[0])
+        p2= m2.goAngle(turret_altitude_angle, statuses[1])
         p1.join()
         p2.join()
         print(f"aiming for globe#{i}")
 
-        while p1.is_alive() and p2.is_alive():
+        while sum([status.done for status in statuses]) < 2:
             print("we are waiting")
             
 

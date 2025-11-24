@@ -65,7 +65,7 @@ class Stepper:
                             dir / Stepper.steps_per_degree) % 360
 
     # ===== Rotation worker =====
-    def __rotate(self, delta):
+    def __rotate(self, delta, status):
         """Rotate the motor by delta degrees (relative)."""
         numSteps = int(Stepper.steps_per_degree * abs(delta))
         dir = self.__sgn(delta)
@@ -73,9 +73,10 @@ class Stepper:
         for _ in range(numSteps):
             self.__step(dir)
             time.sleep(Stepper.delay / 1e6)
+        status.done = True
 
     # ===== Public rotate =====
-    def rotate(self, delta):
+    def rotate(self, delta, status):
         """Rotate by delta degrees and wait until done for this motor."""
         time.sleep(0.05)  # small stagger delay
         p = multiprocessing.Process(target=self.__rotate, args=(delta,))
@@ -83,9 +84,10 @@ class Stepper:
         return p # wait for rotation to complete before continuing
     
     # ===== Absolute rotation =====
-    def goAngle(self, target_angle):
+    def goAngle(self, target_angle, status):
         current = self.angle.value
         delta = target_angle - current
+
 
     # Normalize large differences to find the shortest direction
         if delta > 180:
@@ -94,7 +96,7 @@ class Stepper:
         elif delta < -180:
         # Example: current=350, target=10 → delta=-340 → better to go +20°
             delta += 360
-        return self.rotate(delta)
+        return self.rotate(delta, status)
 
     # ===== Zero the motor =====
     def zero(self):
@@ -134,7 +136,6 @@ if __name__ == '__main__':
     p1.join()
     p2.join()
     
-
 
 
     try:
