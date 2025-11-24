@@ -45,7 +45,7 @@ data ={
 json_data = json.dumps(data)
 def run_server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(("", 4084))   
+    server.bind(("10.217.24.68", 4084))   
     server.listen(1)
 
     print("waiting for connection json server")
@@ -95,7 +95,7 @@ def go_next(target_coordinates,turret_coordinates):
         return [turret_azimuth_angle,turret_altitude_angle]
 
 #-------------------Parsing Json-------------------------------
-url = "http://onepi.local:4084" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
+url = "http://10.217.24.68:4084" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
     #"http://192.168.1.254:8000/positions.json"
 def parse_json():
     
@@ -174,7 +174,7 @@ def initiate():         #This function will parse the json file initate calculat
     #This block of code above is kinda confusing but all it does is output two important list:
     #turret_target_sequence - sequence to aim for turrets
     #globe_target_sequence - sequence for globe, both sequence will be completed by sweeping in one direction initially,
-    #but then will sweep the other direction to hit the turrets along the way back.
+    #but then will sweep the other direction to hit the turrets along the way back. 
 
     #------------------------Code that moves the turret along the two sequence above-----------------------------------
     #First we will follow the globe sequence, assuming that the turret is setup to aim at the zero, we will move in that sequence
