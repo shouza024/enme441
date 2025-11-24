@@ -185,6 +185,7 @@ def initiate():         #This function will parse the json file initate calculat
         p1.join()
         p2.join()
         print(f"aiming for globe#{i}")
+        time.time(5000)
 
     for z,turret in enumerate(turret_target_sequence):
         if theta_position==turret[1]:  #Skips the turret position corresponding to our turret
@@ -196,6 +197,7 @@ def initiate():         #This function will parse the json file initate calculat
         p1.join()
         p2.join()
         print(f"aiming other turret #{z}")
+        time.time(5000)
     
 
 def stopping():         #Stops any motion, honestly not sure how do this yet? Is this required?
