@@ -182,10 +182,11 @@ def initiate():         #This function will parse the json file initate calculat
         def init(self):
             self.done = False
     
-    statuses = [[StepperStatus() for _ in range(2)] for _ in globe]
+    statuses_ = [[StepperStatus() for _ in range(2)] for _ in globe]
 
     for i,globe in enumerate(globe_target_sequence):
-        turret_azimuth_angle,turret_altitude_angle, statuses=go_next(globe,[r_position,theta_position,z_position, statuses])
+        turret_azimuth_angle,turret_altitude_angle=go_next(globe,[r_position,theta_position,z_position])
+        statuses = statuses_[i]
         p1= m1.goAngle(turret_azimuth_angle, statuses[0])
         p2= m2.goAngle(turret_altitude_angle, statuses[1])
         p1.join()
