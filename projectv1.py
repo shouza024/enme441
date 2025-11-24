@@ -186,6 +186,10 @@ def initiate():         #This function will parse the json file initate calculat
         p2.join()
         print(f"aiming for globe#{i}")
 
+        while p1.is_alive() and p2.is_alive():
+            print("we are waiting")
+            
+
     for z,turret in enumerate(turret_target_sequence):
         if theta_position==turret[1]:  #Skips the turret position corresponding to our turret
           continue
