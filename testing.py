@@ -20,7 +20,7 @@ r_position=0          #cm robot radius position
 theta_position =0     #def
 laser_pin = 26
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(laser_pin, GPIO,OUT)
+GPIO.setup(laser_pin, GPIO.OUT)
 GPIO.output(laser_pin, GPIO.LOW)
 
 #------------------Global Objects--------------------------------
