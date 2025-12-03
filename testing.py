@@ -300,6 +300,7 @@ def initiate():         #This function will parse the json file initate calculat
         p1.join()
         p2.join()
         print(f"aiming for globe#{i}")
+        shoot_laser() # Fire Laser
         time.sleep(5)
 
     for z,turret in enumerate(turret_target_sequence):
@@ -312,6 +313,7 @@ def initiate():         #This function will parse the json file initate calculat
         p1.join()
         p2.join()
         print(f"aiming other turret #{z}")
+        shoot_laser() # Fire Laser
         time.sleep(5)
     
 
@@ -330,6 +332,13 @@ def set_zero(azimuth,altitude):
     p2.join()
     m1.zero()
     m2.zero()
+
+def shoot_laser(duration = 3):
+  print("LASER ON")
+  GPIO.output(laser_pin, GPIO.HIGH)
+  time.sleep(duration)
+  GPIO.output(laser_pin, GPIO.LOW)
+  print("LASER OFF")
 
 
 
