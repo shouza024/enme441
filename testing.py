@@ -159,7 +159,7 @@ data ={
 json_data = json.dumps(data)
 def run_server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(("10.217.24.68", 4084))   
+    server.bind(("10.229.44.68", 4084))   
     server.listen(1)
 
     print("waiting for connection json server")
@@ -209,7 +209,7 @@ def go_next(target_coordinates,turret_coordinates):
         return [turret_azimuth_angle,turret_altitude_angle]
 
 #-------------------Parsing Json-------------------------------
-url = "hhttp://10.112.150.68:4084" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
+url = "http://10.229.44.68:4084" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
     #"http://192.168.1.254:8000/positions.json"
 def parse_json():
     
