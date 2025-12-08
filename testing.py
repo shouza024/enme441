@@ -586,7 +586,7 @@ def server_web_page():         ##
 
 
 d = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-d.bind(('',8084))
+d.bind(('',4084))
 d.listen(3)
 
 web_page_thread = threading.Thread(target=server_web_page)
