@@ -322,6 +322,11 @@ def initiate():         #This function will parse the json file initate calculat
         print(f"aiming for globe#{i}")
         shoot_laser() # Fire Laser
         time.sleep(5)
+    print("Resetting altitude (pitch) back to zero before turret targeting...")
+        p_alt = m2.goAngle(0)   # Move altitude axis (motor 2) back to level
+        p_alt.join()
+        m2.zero()               # Re-zero altitude axis
+        z_position = 3          # Restore your original turret height reference
 
     for z,turret in enumerate(turret_target_sequence):
         if theta_position==turret[1]:  #Skips the turret position corresponding to our turret
