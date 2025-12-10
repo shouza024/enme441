@@ -32,7 +32,7 @@ m2 = Stepper(s, lock)   #will control azimuth
 m1 = Stepper(s, lock)   #will control altitude
 
 #------------------Server running with json file------------------------------
-
+"""
 data ={
   "turrets": {
     "1": {
@@ -180,7 +180,7 @@ def run_server():
 
     conn.close()
     server.close()
-
+"""
 def angle_diff(target_rad, current_rad):
     diff = (target_rad - current_rad + math.pi) % (2 * math.pi) - math.pi
     return diff
@@ -213,7 +213,7 @@ def go_next(target_coordinates,turret_coordinates):
         return [turret_azimuth_angle,turret_altitude_angle]
 
 #-------------------Parsing Json-------------------------------
-url = "http://10.229.44.68:4084" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
+url = "http://192.168.1.254:8000" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
     #"http://192.168.1.254:8000/positions.json"
 def parse_json():
     
@@ -260,7 +260,7 @@ def initiate():         #This function will parse the json file initate calculat
     print(turret)
     print("Globe list")
     print(globe)
-    n=1                         #assuming that n is our turret position
+    n=20                         #assuming that n is our turret position
     r_position = turret[n][0]
     theta_position=turret[n][1] #assuming that n is id the turrent corresponding to our location, dont know yet how we are getting this value
     z_position = 3              #centimeters of the ground, not sure what this is until cad is fleshed out
@@ -586,7 +586,7 @@ def server_web_page():         ##
 
 
 d = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-d.bind(('',4084))
+d.bind(('',8084))
 d.listen(3)
 
 web_page_thread = threading.Thread(target=server_web_page)
@@ -594,11 +594,11 @@ web_page_thread.daemon = True
 
 
 #_______________________DELETE WHEN DEVIO SERVER UP
-
+"""
 server_thread = threading.Thread(target=run_server)
 server_thread.daemon = True
 server_thread.start()
-
+"""
 
 web_page_thread.start()
 time.sleep(1)
