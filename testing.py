@@ -32,7 +32,7 @@ m2 = Stepper(s, lock)   #will control azimuth
 m1 = Stepper(s, lock)   #will control altitude
 
 #------------------Server running with json file------------------------------
-"""
+
 data ={
   "turrets": {
     "1": {
@@ -180,7 +180,7 @@ def run_server():
 
     conn.close()
     server.close()
-"""
+
 def angle_diff(target_rad, current_rad):
     diff = (target_rad - current_rad + math.pi) % (2 * math.pi) - math.pi
     return diff
@@ -213,7 +213,7 @@ def go_next(target_coordinates,turret_coordinates):
         return [turret_azimuth_angle,turret_altitude_angle]
 
 #-------------------Parsing Json-------------------------------
-url = "http://192.168.1.254:8000" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
+url = "http://10.112.150.68:4084" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
     #"http://192.168.1.254:8000/positions.json"
 def parse_json():
     
@@ -221,11 +221,11 @@ def parse_json():
     response.raise_for_status() 
     data = response.json()#utf8
     print("json filed parsed and copied")
-    '''
+    
     #This code parse the example.json file, only use while in testing
     with open("example.json", "r") as file:
         data = json.load(file)
-    '''
+    
     global turret, globe
     turret = [[id['r'],id['theta']] for id in data['turrets'].values()]
     globe  = [[i['r'],i['theta'],i['z']] for i in data['globes']]
@@ -594,11 +594,11 @@ web_page_thread.daemon = True
 
 
 #_______________________DELETE WHEN DEVIO SERVER UP
-"""
+
 server_thread = threading.Thread(target=run_server)
 server_thread.daemon = True
 server_thread.start()
-"""
+
 
 web_page_thread.start()
 time.sleep(1)
