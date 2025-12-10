@@ -221,11 +221,11 @@ def parse_json():
     response.raise_for_status() 
     data = response.json()#utf8
     print("json filed parsed and copied")
-    
+    '''
     #This code parse the example.json file, only use while in testing
     with open("example.json", "r") as file:
         data = json.load(file)
-    
+    '''
     global turret, globe
     turret = [[id['r'],id['theta']] for id in data['turrets'].values()]
     globe  = [[i['r'],i['theta'],i['z']] for i in data['globes']]
