@@ -163,7 +163,7 @@ data ={
 json_data = json.dumps(data)
 def run_server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(("10.229.44.68", 4084))   
+    server.bind(("10.115.189.68", 4084))   ##10.115.189.68
     server.listen(1)
 
     print("waiting for connection json server")
