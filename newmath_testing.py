@@ -195,10 +195,10 @@ def turret_altitude(target_coord,turret_coord):
     
     # horizontal distance
     delta_theta = angle_diff(theta_p, theta_t)
-    dh = 2 * r_t * math.sin(delta_theta / 2)
+    dh = r_t*abs(delta_theta)
     
     # vertical difference
-    dz = z_p - z_t
+    dz = (z_p - z_t)/100.0
     
     # signed pitch angle
     altitude = math.atan2(dz, dh)
