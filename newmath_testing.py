@@ -316,7 +316,7 @@ def initiate():         #This function will parse the json file initate calculat
     for i,globe in enumerate(globe_target_sequence):
         turret_azimuth_angle,turret_altitude_angle=go_next(globe,[r_position,theta_position,z_position])
         p1= m1.goAngle(turret_azimuth_angle*180/math.pi)
-        p2= m2.goAngle(turret_altitude_angle*180/math.pi)
+        p2= m2.goAngle(-turret_altitude_angle*180/math.pi)
         p1.join()
         p2.join()
         print(f"aiming for globe#{i}")
