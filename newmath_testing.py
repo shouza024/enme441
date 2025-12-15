@@ -326,13 +326,13 @@ def initiate():         #This function will parse the json file initate calculat
           continue
         turret_including_z=turret+[0]   #this zero will probably be some z offset variable
         turret_azimuth_angle,turret_altitude_angle=go_next(turret_including_z,[r_position,theta_position,z_position])
-        #altitude_position += turret_altitude_angle
-        #p2 = m2.goAngle(altitude_position * 180 / math.pi)
-        #p1= m1.goAngle(turret_azimuth_angle*180/math.pi)
-        p1 = m1.goAngle(turret_azimuth_angle*180/math.pi)
-        absolute_altitude = turret(globe, [r_position, theta_position, z_position])
-        p2 = m2.goAngle(absolute_altitude * 180 / math.pi)
-        altitude_position = absolute_altitude
+        altitude_position += turret_altitude_angle
+        p2 = m2.goAngle(altitude_position * 180 / math.pi)
+        p1= m1.goAngle(turret_azimuth_angle*180/math.pi)
+        #p1 = m1.goAngle(turret_azimuth_angle*180/math.pi)
+        #absolute_altitude = turret(globe, [r_position, theta_position, z_position])
+        #p2 = m2.goAngle(absolute_altitude * 180 / math.pi)
+        #altitude_position = absolute_altitude
         p1.join()
         p2.join()
         theta_position = (theta_position + turret_azimuth_angle) % (2*math.pi)
