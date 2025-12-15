@@ -196,7 +196,7 @@ def turret_altitude(target_coord,turret_coord):
     
     # horizontal distance
     delta_theta = angle_diff(theta_p, theta_t)
-    dh = r_t*abs(delta_theta)
+    dh = 2*r_t*math.sin(abs(delta_theta)/2)
     
     # vertical difference
     dz = (z_p - z_t)/100.0
