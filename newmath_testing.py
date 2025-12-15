@@ -19,6 +19,7 @@ stop_signal=0         #boolean
 r_position=0          #cm robot radius position   
 theta_position =0     #def
 laser_pin = 26
+altitude_position = 0.0
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(laser_pin, GPIO.OUT)
 GPIO.output(laser_pin, GPIO.LOW)
@@ -257,7 +258,7 @@ def update(data_dict): # updates global variable base on what is found in the da
 
     # Manual Laser 
     if 'laser_on' in data_dict:
-      print('Manual Laser ON")
+      print('Manual Laser ON')
       shoot_laser(3)
       return 
             
@@ -278,7 +279,7 @@ def update(data_dict): # updates global variable base on what is found in the da
 def initiate():         #This function will parse the json file initate calculating route, and then perform 
     print("initiate run") 
     #Code that finds path
-    global turret, globe, parse_json,r_position,theta_position
+    global turret, globe, parse_json,r_position,theta_position,altitude_position
     parse_json()
     print("Turret list")
     print(turret)
@@ -296,18 +297,18 @@ def initiate():         #This function will parse the json file initate calculat
     #need to find best direction to sweep, which globe is closer the one on its left or right?
     for i,gval in enumerate(sort_globe):
         globe_theta=gval[1]
-        if 360 > angle_diff(globe_theta,theta_position): 
+        if math.pi*2 > angle_diff(globe_theta,theta_position): 
             id_closet_globe = i
             g=abs(theta_position-sort_globe[i][1])
                                                    
-    if g < 360-g:
+    if g < math.pi*2-g:
         sweep_direction = 1 #CW
         globe_target_sequence = sort_globe[id_closet_globe:] + sort_globe[:id_closet_globe]
         sort_turret_inv = sort_turret[::-1]
         last_globe=globe_target_sequence[-1]      #variable holds position of the final globe in aim sequence 
         starting_id_turret=min(range(len(sort_turret_inv)),key=lambda i:abs(sort_turret_inv[i][1]-last_globe[1]))
         turret_target_sequence =sort_turret_inv[starting_id_turret:]+sort_turret_inv[:starting_id_turret]
-    elif g> 360-g:
+    elif g> math.pi*2-g:
         sweep_direction=-1 #CCW    #might need to flip these direction, depends on stepper mottor class
         sort_globe_inv=sort_globe[::-1] #Inverse sort globe list to now be from high to low
         globe_target_sequence = sort_globe[id_closet_globe:] + sort_globe[:id_closet_globe]
@@ -324,9 +325,12 @@ def initiate():         #This function will parse the json file initate calculat
     for i,globe in enumerate(globe_target_sequence):
         turret_azimuth_angle,turret_altitude_angle=go_next(globe,[r_position,theta_position,z_position])
         p1= m1.goAngle(turret_azimuth_angle*180/math.pi)
-        p2= m2.goAngle(-turret_altitude_angle*180/math.pi)
+        altitude_position += turret_altitude_angle
+        p2 = m2.goAngle(altitude_position * 180 / math.pi)
+        
         p1.join()
         p2.join()
+        theta_position = (theta_position + turret_azimuth_angle) % (2*math.pi)
         print(f"aiming for globe#{i}")
         print(f"azimuth{turret_azimuth_angle}")
         print(f"altitude{turret_altitude_angle}")
@@ -334,20 +338,22 @@ def initiate():         #This function will parse the json file initate calculat
         time.sleep(5)
     
     print("Resetting altitude (pitch) back to zero before turret targeting...")
+    altitude_position =0.0
     p_alt = m2.goAngle(0)   # Move altitude axis (motor 2) back to level
-    p_alt.join()
-    m2.zero()               # Re-zero altitude axis
-    z_position = 3          # Restore your original turret height reference
+    p_alt.join()              # Re-zero altitude axis
+              # Restore your original turret height reference
 
     for z,turret in enumerate(turret_target_sequence):
         if theta_position==turret[1]:  #Skips the turret position corresponding to our turret
           continue
         turret_including_z=turret+[0]   #this zero will probably be some z offset variable
         turret_azimuth_angle,turret_altitude_angle=go_next(turret_including_z,[r_position,theta_position,z_position])
+        altitude_position += turret_altitude_angle
+        p2 = m2.goAngle(altitude_position * 180 / math.pi)
         p1= m1.goAngle(turret_azimuth_angle*180/math.pi)
-        p2= m2.goAngle(turret_altitude_angle*180/math.pi)
         p1.join()
         p2.join()
+        theta_position = (theta_position + turret_azimuth_angle) % (2*math.pi)
         print(f"aiming other turret #{z}")
         shoot_laser() # Fire Laser
         time.sleep(5)
