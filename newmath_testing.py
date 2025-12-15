@@ -320,6 +320,8 @@ def initiate():         #This function will parse the json file initate calculat
         p1.join()
         p2.join()
         print(f"aiming for globe#{i}")
+        print(f"azimuth{turret_azimuth_angle}")
+        print(f"altitude{turret_altitude_angle}")
         shoot_laser() # Fire Laser
         time.sleep(5)
     
