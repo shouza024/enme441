@@ -35,7 +35,6 @@ m1 = Stepper(s, lock)   #will control altitude
 #------------------Server running with json file------------------------------
 
 data ={
-  {
   "turrets": {
     "1": {
       "r": 182.8,
