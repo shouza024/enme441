@@ -319,12 +319,12 @@ def initiate():         #This function will parse the json file initate calculat
     p_alt.join()              # Re-zero altitude axis
               # Restore your original turret height reference
 
-    for z,turret in enumerate(turret_target_sequence):
-           # Skip current turret
-        if abs(angle_diff(theta_position, turret_target[1])) < 1e-3:
-            continue
+    for z, t_target in enumerate(turret_target_sequence):
+    # Skip current turret
+        if abs(angle_diff(theta_position, t_target[1])) < 1e-3:
+        continue
 
-        turret_including_z = turret_target + [0]  # z offset if needed
+        turret_including_z = t_target + [0]  # z offset if needed
         turret_azimuth_angle, turret_altitude_angle = go_next(turret_including_z, [r_position, theta_position, z_position])
 
         abs_altitude_deg = turret_altitude_angle * 180 / math.pi
@@ -334,7 +334,7 @@ def initiate():         #This function will parse the json file initate calculat
         p1.join()
         p2.join()
 
-        # Update references
+    # Update references
         theta_position = (theta_position + turret_azimuth_angle) % (2 * math.pi)
         altitude_position = abs_altitude_deg * math.pi / 180
 
