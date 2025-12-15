@@ -254,6 +254,13 @@ def parse_json():
 #-----------------Control function Base on the data_dict read into Pi-----------------------------
 def update(data_dict): # updates global variable base on what is found in the data_dict
     global run_signal, stop_signal,azimuth_input, altitude_input
+
+    # Manual Laser 
+    if 'laser_on' in data_dict:
+      print('Manual Laser ON")
+      shoot_laser(3)
+      return 
+            
     if 'run_signal' in data_dict:
         run_signal = bool(data_dict['run_signal'])
         if run_signal==True:
@@ -266,6 +273,7 @@ def update(data_dict): # updates global variable base on what is found in the da
         azimuth_input = float(data_dict['azimuth'])
         altitude_input= float(data_dict['altitude'])
         set_zero(azimuth_input,altitude_input)
+ 
       
 def initiate():         #This function will parse the json file initate calculating route, and then perform 
     print("initiate run") 
@@ -468,7 +476,7 @@ def web_page():
       border: none;
       border-radius: 12px;
       cursor: pointer;
-      margin-top: 10px;
+      margin-top: 12px;
       background: linear-gradient(135deg, #0047ff, #00eaff);
       color: white;
       font-weight: bold;
@@ -487,8 +495,12 @@ def web_page():
       cursor: not-allowed;
       box-shadow: none;
     }
-  </style>
 
+    .laser-btn {
+      background: linear-gradient(135deg, #ff3b3b, #ff9f00);
+      box-shadow: 0 0 18px rgba(255, 80, 0, 0.9);
+    }
+  </style>
 </head>
 
 <body>
@@ -496,9 +508,8 @@ def web_page():
   <div class="calibration-card">
     <h2>LASER TURRET CALIBRATION</h2>
 
-    <!-- MAIN CALIBRATION FORM -->
+    <!-- CALIBRATION FORM -->
     <form id="calibrationForm" action="/set_zero.php" method="POST">
-      
       <div class="input-row">
         <label for="altitude">Altitude Angle:</label>
         <input type="text" id="altitude" name="altitude" placeholder="Enter altitude offset">
@@ -512,12 +523,10 @@ def web_page():
       </div>
 
       <button id="submitBtn" type="submit">SET ZERO POSITION</button>
-
     </form>
 
-    <!-- NEW FORM FOR RUN + STOP -->
+    <!-- RUN / STOP CONTROLS -->
     <form action="/turret_control.php" method="POST">
-
       <input type="hidden" id="run_signal" name="run_signal" value="false">
       <input type="hidden" id="stop_signal" name="stop_signal" value="false">
 
@@ -534,10 +543,20 @@ def web_page():
       ">
         EMERGENCY STOP
       </button>
-
     </form>
-  </div>
 
+    <!-- MANUAL LASER CONTROL -->
+    <form action="/laser_control.php" method="POST">
+      <input type="hidden" name="laser_on" value="true">
+
+      <button type="submit"
+        class="laser-btn"
+        onclick="return confirm('WARNING: Turn laser ON manually?');">
+        MANUAL LASER ON
+      </button>
+    </form>
+
+  </div>
 
   <script>
     const altitudeInput = document.getElementById("altitude");
@@ -570,7 +589,6 @@ def web_page():
 
 </body>
 </html>
-
     """
     return bytes(html,'utf-8')
 
