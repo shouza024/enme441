@@ -216,27 +216,23 @@ def go_next(target_coordinates,turret_coordinates):
     r_p, theta_p, z_p = target_coordinates
 
     # Angular difference between turret and target
+    r_t, theta_t, z_t = turret_coordinates
+    r_p, theta_p, z_p = target_coordinates
+
+    # --- Azimuth: shortest rotation along the circle ---
+    # signed difference in radians (-pi, pi)
     dtheta = angle_diff(theta_p, theta_t)
-    abs_dtheta = abs(dtheta)
+    turret_azimuth_angle = dtheta  # move exactly this amount
 
-    # Law of cosines for isosceles triangle (turret at circle radius)
-    # turret_azimuth_angle = angle at turret to reach target along chord
-    # chord_length = 2 * r_t * sin(abs_dtheta / 2)
-    chord_length = 2 * r_t * math.sin(abs_dtheta / 2)
-    # angle at turret vertex (opposite chord)
-    if chord_length / (2 * r_t) > 1:
-        # clamp for numerical errors
-        chord_length = 2 * r_t
-    turret_azimuth_angle = math.asin(chord_length / (2 * r_t))
-    
-    # Keep the direction correct
-    turret_azimuth_angle *= -1 if dtheta > 0 else 1
+    # --- Horizontal chord length for altitude ---
+    chord_length = 2 * r_t * math.sin(abs(dtheta) / 2)
 
-    # Altitude (vertical angle)
+    # --- Altitude (pitch) angle ---
     dz = z_p - z_t
-    altitude_angle = math.atan2(dz, chord_length)
+    turret_altitude_angle = math.atan2(dz, chord_length)
+
+    return [turret_azimuth_angle, turret_altitude_angle]
     #return [turret_azimuth_angle, turret_altitude_angle]
-    return [turret_azimuth_angle, altitude_angle]
 
 #-------------------Parsing Json-------------------------------
 url = "http://127.0.1.1:4084" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
