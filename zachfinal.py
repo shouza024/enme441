@@ -255,28 +255,6 @@ def update(data_dict): # updates global variable base on what is found in the da
  
       
 def initiate():         #This function will parse the json file initate calculating route, and then perform 
-    """
-    Initiates targeting sequence:
-    1. Sweep through globes first
-    2. Then aim at turrets in order, skipping your own
-    """
-    """
-    print("Initiate simple run") 
-    global turret, globe, r_position, theta_position, altitude_position
-
-    # Parse JSON
-    parse_json()
-    print("Turret list:", turret)
-    print("Globe list:", globe)
-
-    # Assume starting turret (your current location)
-    my_turret_id = 2                   # your turret ID
-    my_turret_theta = turret_data[str(my_turret_id)]["theta"]
-    r_position = turret[my_turret_id-1][0]
-    theta_position = turret[my_turret_id-1][1]
-    z_position = 3  # cm above ground
-    """
-    
     print("initiate run") 
     global turret, globe, parse_json, r_position, theta_position, altitude_position
 
@@ -290,6 +268,15 @@ def initiate():         #This function will parse the json file initate calculat
     r_position = data['turrets'][my_turret_id]['r']
     theta_position = data['turrets'][my_turret_id]['theta']  # radians
     z_position = 3  # cm above ground
+    altitude_position = 0.0
+
+    origin = [0, 0, 0]  # center of the circle
+    azimuth_to_origin, altitude_to_origin = go_next(origin, [r_position, theta_position, z_position])
+    p1 = m1.goAngle(azimuth_to_origin * 180 / math.pi)
+    p2 = m2.goAngle(altitude_to_origin * 180 / math.pi)
+    p1.join()
+    p2.join()
+    print("Laser aimed at origin (center)")
 
     # Sort globes and turrets by theta
     sort_globe = sorted(globe, key=lambda g: g[1])
