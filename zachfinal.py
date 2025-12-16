@@ -230,7 +230,7 @@ def go_next(target_coordinates,turret_coordinates):
     turret_azimuth_angle = math.asin(chord_length / (2 * r_t))
     
     # Keep the direction correct
-    turret_azimuth_angle *= 1 if dtheta > 0 else -1
+    turret_azimuth_angle *= -1 if dtheta > 0 else 1
 
     # Altitude (vertical angle)
     dz = z_p - z_t
