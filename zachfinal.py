@@ -286,9 +286,9 @@ def initiate():         #This function will parse the json file initate calculat
     print("Globe list:", globe)
 
     # Assume starting turret (your location)
-    n = 1
-    r_position = turret[n][0]
-    theta_position = turret[n][1]  # radians
+    my_turret_id = "2"   # JSON ID of your turret
+    r_position = data['turrets'][my_turret_id]['r']
+    theta_position = data['turrets'][my_turret_id]['theta']  # radians
     z_position = 3  # cm above ground
 
     # Sort globes and turrets by theta
