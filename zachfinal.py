@@ -260,6 +260,7 @@ def initiate():         #This function will parse the json file initate calculat
     1. Sweep through globes first
     2. Then aim at turrets in order, skipping your own
     """
+    """
     print("Initiate simple run") 
     global turret, globe, r_position, theta_position, altitude_position
 
@@ -274,7 +275,8 @@ def initiate():         #This function will parse the json file initate calculat
     r_position = turret[my_turret_id-1][0]
     theta_position = turret[my_turret_id-1][1]
     z_position = 3  # cm above ground
-    '''
+    """
+    
     print("initiate run") 
     global turret, globe, parse_json, r_position, theta_position, altitude_position
 
@@ -284,7 +286,7 @@ def initiate():         #This function will parse the json file initate calculat
     print("Globe list:", globe)
 
     # Assume starting turret (your location)
-    n = 19
+    n = 1
     r_position = turret[n][0]
     theta_position = turret[n][1]  # radians
     z_position = 3  # cm above ground
@@ -308,7 +310,7 @@ def initiate():         #This function will parse the json file initate calculat
     last_globe = globe_target_sequence[-1]
     starting_id_turret = min(range(len(sort_turret_inv)), key=lambda i: abs(sort_turret_inv[i][1] - last_globe[1]))
     turret_target_sequence = sort_turret_inv[starting_id_turret:] + sort_turret_inv[:starting_id_turret]
-    '''
+    
     #------------------------Code that moves the turret along the two sequence above-----------------------------------
     #First we will follow the globe sequence, assuming that the turret is setup to aim at the zero, we will move in that sequence
     for i,globe in enumerate(globe_target_sequence):
