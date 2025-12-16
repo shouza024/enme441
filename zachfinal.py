@@ -206,7 +206,7 @@ def go_next(target_coordinates,turret_coordinates):
     # Altitude stays same (your existing code)
     turret_altitude_angle = turret_altitude(target_coordinates, turret_coordinates)
     '''
-  """
+    """
     Returns signed azimuth and altitude rotation for turret to aim at target.
     target_coordinates: [r, theta, z]
     turret_coordinates: [r, theta, z]
