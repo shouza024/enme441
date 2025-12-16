@@ -235,7 +235,8 @@ def go_next(target_coordinates,turret_coordinates):
     # Altitude (vertical angle)
     dz = z_p - z_t
     altitude_angle = math.atan2(dz, chord_length)
-    return [turret_azimuth_angle, turret_altitude_angle]
+    #return [turret_azimuth_angle, turret_altitude_angle]
+    return [turret_azimuth_angle, altitude_angle]
 
 #-------------------Parsing Json-------------------------------
 url = "http://127.0.1.1:4084" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
