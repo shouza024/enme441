@@ -142,7 +142,7 @@ data ={
 json_data = json.dumps(data)
 def run_server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(("10.115.189.68", 4084))   ##10.115.189.68 Erick Ip ## 127.0.1.1
+    server.bind(("10.115.189.68", 4084))   ##10.115.189.68 Erick Ip   ## 127.0.1.1 Zach Ip address
     server.listen(1)
 
     print("waiting for connection json server")
@@ -381,7 +381,8 @@ def initiate():         #This function will parse the json file initate calculat
     
 
 def stopping():         #Stops any motion, honestly not sure how do this yet? Is this required?
-    print('stop')
+    print('stoping')
+
     
 
 def set_zero(azimuth,altitude):
@@ -655,6 +656,7 @@ def server_web_page():         ##
 
 
 d = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+d.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
 d.bind(('',8084))
 d.listen(3)
 
@@ -680,5 +682,7 @@ try:
 
     
 except KeyboardInterrupt:
+    d.close()
+    GPIO.cleanup()
     print("Could not fetch JSON FILE")
  
