@@ -142,7 +142,7 @@ data ={
 json_data = json.dumps(data)
 def run_server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(("10.115.189.68", 4084))   ##10.115.189.68
+    server.bind(("127.0.1.1", 4084))   ##10.115.189.68
     server.listen(1)
 
     print("waiting for connection json server")
@@ -208,7 +208,7 @@ def go_next(target_coordinates,turret_coordinates):
     return [turret_azimuth_angle, turret_altitude_angle]
 
 #-------------------Parsing Json-------------------------------
-url = "http://10.115.189.68:4084" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
+url = "http://127.0.1.1:4084" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
     #"http://192.168.1.254:8000/positions.json"
 def parse_json():
     
@@ -264,7 +264,7 @@ def initiate():         #This function will parse the json file initate calculat
     print("Globe list:", globe)
 
     # Assume starting turret (your location)
-    n = 1
+    n = 19
     r_position = turret[n][0]
     theta_position = turret[n][1]  # radians
     z_position = 3  # cm above ground
