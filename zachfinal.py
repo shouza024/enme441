@@ -200,7 +200,7 @@ def go_next(target_coordinates,turret_coordinates):
     turret_azimuth_angle = (math.pi - abs_dtheta) / 2
 
     # Direction: same sign as dtheta
-    turret_azimuth_angle *= 1 if dtheta > 0 else -1
+    turret_azimuth_angle *= -1 if dtheta > 0 else 1
 
     # Altitude stays same (your existing code)
     turret_altitude_angle = turret_altitude(target_coordinates, turret_coordinates)
