@@ -255,7 +255,7 @@ def update(data_dict): # updates global variable base on what is found in the da
  
       
 def initiate():         #This function will parse the json file initate calculating route, and then perform 
-   """
+    """
     Initiates targeting sequence:
     1. Sweep through globes first
     2. Then aim at turrets in order, skipping your own
