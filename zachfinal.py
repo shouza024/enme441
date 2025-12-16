@@ -186,6 +186,7 @@ def turret_altitude(target_coord,turret_coord):
 def go_next(target_coordinates,turret_coordinates):
         #target_coordinates - list contain [radians, theta, zeta]
         #turret_coordinates - list contains [radians, theta, zeta] zeta might be decide by our cad model, when we get around to that
+    '''
     r_t, theta_t, z_t = turret_coordinates
     r_p, theta_p, z_p = target_coordinates
 
@@ -204,7 +205,36 @@ def go_next(target_coordinates,turret_coordinates):
 
     # Altitude stays same (your existing code)
     turret_altitude_angle = turret_altitude(target_coordinates, turret_coordinates)
+    '''
+  """
+    Returns signed azimuth and altitude rotation for turret to aim at target.
+    target_coordinates: [r, theta, z]
+    turret_coordinates: [r, theta, z]
+    All angles in radians, r in cm
+    """
+    r_t, theta_t, z_t = turret_coordinates
+    r_p, theta_p, z_p = target_coordinates
 
+    # Angular difference between turret and target
+    dtheta = angle_diff(theta_p, theta_t)
+    abs_dtheta = abs(dtheta)
+
+    # Law of cosines for isosceles triangle (turret at circle radius)
+    # turret_azimuth_angle = angle at turret to reach target along chord
+    # chord_length = 2 * r_t * sin(abs_dtheta / 2)
+    chord_length = 2 * r_t * math.sin(abs_dtheta / 2)
+    # angle at turret vertex (opposite chord)
+    if chord_length / (2 * r_t) > 1:
+        # clamp for numerical errors
+        chord_length = 2 * r_t
+    turret_azimuth_angle = math.asin(chord_length / (2 * r_t))
+    
+    # Keep the direction correct
+    turret_azimuth_angle *= 1 if dtheta > 0 else -1
+
+    # Altitude (vertical angle)
+    dz = z_p - z_t
+    altitude_angle = math.atan2(dz, chord_length)
     return [turret_azimuth_angle, turret_altitude_angle]
 
 #-------------------Parsing Json-------------------------------
