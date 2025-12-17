@@ -249,7 +249,8 @@ def parse_json():
         data = json.load(file)
     '''
     global turret, globe
-    turret = [[id['r'],id['theta']] for id in data['turrets'].values()]
+    z_offset =2
+    turret = [[id['r'],id['theta'],z_offset] for id in data['turrets'].values()]
     globe  = [[i['r'],i['theta'],i['z']] for i in data['globes']]
     
 
