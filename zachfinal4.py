@@ -213,8 +213,8 @@ def aim_at_center(turret_coordinates):
     altitude = math.atan2(-z_t, r_t)  # Negative because center is lower if we're above it
     
     return [azimuth, altitude]
-#-------------------Parsing Json-------------------------------
-url = "http://127.0.1.1:4084" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
+#-------------------Parsing -------------------------------
+url = "http://192.168.1.254:8000/positions.json" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
     #"http://192.168.1.254:8000/positions.json"
 def parse_json():
     
@@ -763,11 +763,11 @@ web_page_thread.daemon = True
 
 
 #_______________________DELETE WHEN DEVIO SERVER UP
-
+'''
 server_thread = threading.Thread(target=run_server)
 server_thread.daemon = True
 server_thread.start()
-
+'''
 
 web_page_thread.start()
 time.sleep(1)
