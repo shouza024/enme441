@@ -226,6 +226,7 @@ def go_next(target_coordinates,turret_coordinates):
 
     # --- Horizontal chord length for altitude ---
     chord_length = 2 * r_t * math.sin(abs(dtheta) / 2)
+    chord_length = max(chord_length, 1e-6)
 
     # --- Altitude (pitch) angle ---
     dz = z_p - z_t
@@ -347,9 +348,10 @@ def initiate():
     # ---- Sweep globes ----
     for i, g in enumerate(globe_sequence):
         # Adjust target theta relative to mechanical zero
-        adjusted_theta = g[1] - theta_zero
-        azimuth_angle, altitude_angle = go_next([g[0], adjusted_theta, g[2]],
-                                                [r_position, 0.0, z_position])
+        azimuth_angle, altitude_angle = go_next(
+            [g[0], g[1], g[2]],                  # absolute globe angle
+            [r_position, theta_zero, z_position] # absolute turret angle
+        )
         p1 = m1.goAngle(math.degrees(azimuth_angle))
         p2 = m2.goAngle(math.degrees(altitude_angle))
         p1.join()
@@ -363,9 +365,9 @@ def initiate():
         # Skip if already at this position
         if abs(angle_diff(theta_zero, t[1])) < 1e-3:
             continue
-        adjusted_theta = t[1] - theta_zero
-        azimuth_angle, altitude_angle = go_next([t[0], adjusted_theta, z_position],
-                                                [r_position, 0.0, z_position])
+        
+        azimuth_angle, altitude_angle = go_next([t[0], t[1], z_position],
+                                                [r_position, 0.0, 5])
         p1 = m1.goAngle(math.degrees(azimuth_angle))
         p2 = m2.goAngle(math.degrees(altitude_angle))
         p1.join()
