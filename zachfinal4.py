@@ -260,7 +260,47 @@ def update(data_dict): # updates global variable base on what is found in the da
         altitude_input= float(data_dict['altitude'])
         set_zero(azimuth_input,altitude_input)
  
-      
+def create_optimal_sequence(my_theta, targets):
+    """
+    Create optimal sequence to minimize total movement.
+    
+    Args:
+        my_theta: Our current azimuth angle (radians)
+        targets: List of [r, theta, z] for each target
+        
+    Returns:
+        Sorted list of targets in optimal order
+    """
+    # Calculate angular distance from our position
+    targets_with_dist = []
+    for target in targets:
+        dtheta = angle_diff(target[1], my_theta)
+        targets_with_dist.append((target, dtheta))
+    
+    # Sort by angular distance (absolute value)
+    targets_with_dist.sort(key=lambda x: abs(x[1]))
+    
+    # Now we have closest first, farthest last
+    # But we can optimize further...
+    
+    # Actually, simplest: sort by theta in increasing order
+    # This gives a natural sweep around the circle
+    sorted_by_theta = sorted(targets, key=lambda t: t[1])
+    
+    # Find where we are in this sequence
+    # Place targets so we start with closest and go around
+    idx = 0
+    min_dist = float('inf')
+    for i, target in enumerate(sorted_by_theta):
+        dist = abs(angle_diff(target[1], my_theta))
+        if dist < min_dist:
+            min_dist = dist
+            idx = i
+    
+    # Create sequence starting from closest
+    optimal_sequence = sorted_by_theta[idx:] + sorted_by_theta[:idx]
+    
+    return optimal_sequence      
 def initiate():
     """FAST version - no return to center between targets"""
     print("FAST initiate run")
