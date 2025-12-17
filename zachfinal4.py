@@ -236,29 +236,31 @@ def parse_json():
     #turret[id][r,theta] 
     #globe[id][r,theta,z] How to find any values from the json file
     #print(turret[1][1]) #Print turret radius of turret id 1.
+def set_zero(azimuth, altitude):
+    print(f'moving to new desired zero: azimuth={azimuth}°, altitude={altitude}°')
+    global m1, m2
+    
+    # Move both axes simultaneously
+    p1 = m1.goAngle(azimuth)
+    p2 = m2.goAngle(altitude)
+    
+    # Wait for both to complete
+    p1.join()
+    p2.join()
+    
+    # Reset the stepper angle tracking to zero at current position
+    m1.zero()
+    m2.zero()
+    
+    print(f'Zero position set: azimuth={azimuth}°, altitude={altitude}°')
+
+def stopping():         
+    print('stopping')
+    # Add any emergency stop logic here if needed
+    # For example: stop any ongoing movements
 
 #-----------------Control function Base on the data_dict read into Pi-----------------------------
-def update(data_dict): # updates global variable base on what is found in the data_dict
-    global run_signal, stop_signal,azimuth_input, altitude_input
 
-    # Manual Laser 
-    if 'laser_on' in data_dict:
-      print('Manual Laser ON')
-      shoot_laser(3, "Manual Control")  # Added target_name parameter
-      return 
-            
-    if 'run_signal' in data_dict:
-        run_signal = bool(data_dict['run_signal'])
-        if run_signal==True:
-          initiate()
-    if 'stop_signal' in data_dict:
-        stop_signal = bool(data_dict['stop_signal'])
-        if run_signal==True:
-          stopping()
-    if 'azimuth' in data_dict:
-        azimuth_input = float(data_dict['azimuth'])
-        altitude_input= float(data_dict['altitude'])
-        set_zero(azimuth_input,altitude_input)
  
 def create_optimal_sequence(my_theta, targets):
     """
@@ -481,7 +483,27 @@ def shoot_laser(duration=3, target_name=None):
         print(f"   LASER OFF - {target_name} targeted")
     else:
         print(f"   LASER OFF")
+def update(data_dict): # updates global variable base on what is found in the data_dict
+    global run_signal, stop_signal,azimuth_input, altitude_input
 
+    # Manual Laser 
+    if 'laser_on' in data_dict:
+      print('Manual Laser ON')
+      shoot_laser(3, "Manual Control")  # Added target_name parameter
+      return 
+            
+    if 'run_signal' in data_dict:
+        run_signal = bool(data_dict['run_signal'])
+        if run_signal==True:
+          initiate()
+    if 'stop_signal' in data_dict:
+        stop_signal = bool(data_dict['stop_signal'])
+        if run_signal==True:
+          stopping()
+    if 'azimuth' in data_dict:
+        azimuth_input = float(data_dict['azimuth'])
+        altitude_input= float(data_dict['altitude'])
+        set_zero(azimuth_input,altitude_input)
 #-----------------HTML Setup-----------------------------------
 ##web page function-setups the page window for user to submit desired brightness level input
 def web_page():
