@@ -195,7 +195,7 @@ def go_next(target_coordinates,turret_coordinates):
     chord_length = 2 * r_t * math.sin(abs(dtheta) / 2)
     dz = z_p - z_t
     
-    altitude = math.atan2(dz, chord_length)
+    altitude = -math.atan2(dz, chord_length)
     
     return [azimuth, altitude]
 def aim_at_center(turret_coordinates):
@@ -425,7 +425,7 @@ def initiate():
                 # First target: move directly from center
                 print(f"   Moving from center to target...")
                 p1 = m1.goAngle(azimuth_deg)
-                p2 = m2.goAngle(-1*altitude_deg)
+                p2 = m2.goAngle(altitude_deg)
             else:
                 # Subsequent targets: move relative to current position
                 delta_azimuth = azimuth - current_azimuth
