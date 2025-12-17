@@ -185,11 +185,11 @@ def go_next(target_coordinates,turret_coordinates):
     if abs(abs(dtheta) - math.pi) < 0.001:
         # Target opposite us, aim 90° from inward
         azimuth = math.pi/2
-        azimuth *= 1 if dtheta >= 0 else -1
+        azimuth *= -1 if dtheta >= 0 else 1
     else:
         # General case: (π - |Δθ|)/2
         azimuth = (math.pi - abs(dtheta)) / 2
-        azimuth *= 1 if dtheta >= 0 else -1
+        azimuth *= -1 if dtheta >= 0 else 1
     
     # Altitude
     chord_length = 2 * r_t * math.sin(abs(dtheta) / 2)
