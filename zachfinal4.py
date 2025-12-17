@@ -315,61 +315,129 @@ def initiate():
     theta_position = current_data['turrets'][my_turret_id]['theta']
     z_position = 0
     
-    # Collect all targets
+    # Create a mapping of turret IDs to their indices for reference
+    turret_id_to_data = {}
+    for tid, tdata in current_data['turrets'].items():
+        turret_id_to_data[tid] = tdata
+    
+    # Collect all targets with metadata
     all_targets = []
     
     # Globes
-    for g in current_data['globes']:
-        all_targets.append([g['r'], g['theta'], g['z']])
+    for i, g in enumerate(current_data['globes']):
+        all_targets.append({
+            'type': 'globe',
+            'id': f"globe_{i+1}",
+            'display_name': f"Globe {i+1}",
+            'r': g['r'],
+            'theta': g['theta'],
+            'z': g['z'],
+            'data': g
+        })
     
     # Other turrets
     for tid, tdata in current_data['turrets'].items():
         if tid != my_turret_id:
-            all_targets.append([tdata['r'], tdata['theta'], z_position])
+            # Find turret's display number
+            turret_num = int(tid) if tid.isdigit() else 0
+            all_targets.append({
+                'type': 'turret',
+                'id': tid,
+                'display_name': f"Turret #{tid}",
+                'r': tdata['r'],
+                'theta': tdata['theta'],
+                'z': z_position,
+                'data': tdata
+            })
     
     # Create optimal sequence
-    sequence = create_optimal_sequence(theta_position, all_targets)
+    sequence_targets = [t for t in all_targets]  # Make a copy
+    sequence = create_optimal_sequence(theta_position, [
+        [t['r'], t['theta'], t['z']] for t in sequence_targets
+    ])
+    
+    # Create mapping from coordinates back to target info
+    coord_to_target = {}
+    for target_info in sequence_targets:
+        coord_key = (target_info['r'], target_info['theta'], target_info['z'])
+        coord_to_target[coord_key] = target_info
     
     print(f"Found {len(sequence)} targets")
+    print("=" * 50)
+    
+    # Display all targets in sequence order
+    print("\nTARGET SEQUENCE:")
+    for i, coords in enumerate(sequence):
+        target_info = coord_to_target.get((coords[0], coords[1], coords[2]))
+        if target_info:
+            deg = coords[1] * 180 / math.pi
+            print(f"{i+1:2d}. {target_info['display_name']:15s} θ = {deg:6.1f}°")
+    
+    print("=" * 50)
     
     # Start from current position (assume we're at center)
     current_azimuth = 0.0  # Currently aiming at center
     current_altitude = math.atan2(-z_position, r_position)  # Angle to center
     
+    # Calculate our position in degrees for display
+    our_theta_deg = theta_position * 180 / math.pi
+    print(f"\nOur position: Turret #{my_turret_id} at θ = {our_theta_deg:.1f}°")
+    print(f"Starting from center (azimuth=0°, altitude={current_altitude*180/math.pi:.1f}°)")
+    
     # Move to first target from center
     if sequence:
-        print("\nMoving to first target...")
-        target = sequence[0]
-        azimuth, altitude = go_next(target, [r_position, theta_position, z_position])
+        print("\n" + "=" * 50)
         
-        # Convert to absolute motor positions
-        abs_azimuth = azimuth * 180 / math.pi
-        abs_altitude = altitude * 180 / math.pi
-        
-        p1 = m1.goAngle(abs_azimuth)
-        p2 = m2.goAngle(abs_altitude)
-        p1.join()
-        p2.join()
-        
-        current_azimuth = azimuth
-        current_altitude = altitude
-        
-        shoot_laser(2)
-        
-        # Continue to remaining targets WITHOUT returning to center
-        for i, target in enumerate(sequence[1:], 1):
-            print(f"\nTarget {i+1}/{len(sequence)}")
+        for i, coords in enumerate(sequence):
+            # Get target info
+            target_info = coord_to_target.get((coords[0], coords[1], coords[2]))
             
-            # Calculate angles to next target
-            azimuth, altitude = go_next(target, [r_position, theta_position, z_position])
+            if not target_info:
+                print(f"\nERROR: Could not find target info for coordinates {coords}")
+                continue
             
-            # Calculate RELATIVE movement from current position
-            delta_azimuth = azimuth - current_azimuth
-            delta_altitude = altitude - current_altitude
+            print(f"\n[{i+1}/{len(sequence)}] AIMING AT: {target_info['display_name']}")
+            print(f"   Type: {target_info['type'].upper()}")
             
-            # Move relative to current position
-            p1 = m1.rotate(delta_azimuth * 180 / math.pi)
-            p2 = m2.rotate(delta_altitude * 180 / math.pi)
+            # Calculate position info
+            target_theta_deg = coords[1] * 180 / math.pi
+            angular_separation = angle_diff(coords[1], theta_position) * 180 / math.pi
+            
+            print(f"   Target θ: {target_theta_deg:.1f}°")
+            print(f"   Angular separation from us: {abs(angular_separation):.1f}°")
+            
+            if target_info['type'] == 'globe':
+                print(f"   Height (z): {coords[2]} cm")
+            
+            # Calculate aiming angles
+            azimuth, altitude = go_next(coords, [r_position, theta_position, z_position])
+            
+            # Convert to degrees
+            azimuth_deg = azimuth * 180 / math.pi
+            altitude_deg = altitude * 180 / math.pi
+            
+            print(f"   Required azimuth: {azimuth_deg:6.1f}°")
+            print(f"   Required altitude: {altitude_deg:6.1f}°")
+            
+            if i == 0:
+                # First target: move directly from center
+                print(f"   Moving from center to target...")
+                p1 = m1.goAngle(azimuth_deg)
+                p2 = m2.goAngle(altitude_deg)
+            else:
+                # Subsequent targets: move relative to current position
+                delta_azimuth = azimuth - current_azimuth
+                delta_altitude = altitude - current_altitude
+                delta_azimuth_deg = delta_azimuth * 180 / math.pi
+                delta_altitude_deg = delta_altitude * 180 / math.pi
+                
+                print(f"   ΔAzimuth from previous: {delta_azimuth_deg:6.1f}°")
+                print(f"   ΔAltitude from previous: {delta_altitude_deg:6.1f}°")
+                
+                p1 = m1.rotate(delta_azimuth_deg)
+                p2 = m2.rotate(delta_altitude_deg)
+            
+            # Wait for movements to complete
             p1.join()
             p2.join()
             
@@ -377,36 +445,34 @@ def initiate():
             current_azimuth = azimuth
             current_altitude = altitude
             
-            shoot_laser(2)
-            time.sleep(0.5)  # Brief pause
+            # Shoot laser with target info
+            print(f"   FIRING LASER at {target_info['display_name']}...")
+            shoot_laser_with_info(2, target_info['display_name'])
+            
+            # Brief pause between targets
+            if i < len(sequence) - 1:  # Not the last target
+                print(f"   Preparing for next target...")
+                time.sleep(0.5)
     
-    print("\nSequence complete!")
+    print("\n" + "=" * 50)
+    print("SEQUENCE COMPLETE!")
+    print(f"Successfully aimed at {len(sequence)} targets")
     
-
-def stopping():         #Stops any motion, honestly not sure how do this yet? Is this required?
-    print('stoping')
-
-    
-
-def set_zero(azimuth,altitude):
-    print('moving to new desire zero')
-    global m1,m2
-    p2 = m2.goAngle(azimuth)
-    p1 = m1.goAngle(altitude)
+    # Return to center at the end
+    print("\nReturning to center position...")
+    p1 = m1.goAngle(0)
+    p2 = m2.goAngle(0)
     p1.join()
-    print(f'moving m1 to {altitude}')
-    print(f"moving m2 to {azimuth}")
     p2.join()
-    m1.zero()
-    m2.zero()
+    print("Back at center (azimuth=0°, altitude=0°)")
 
-def shoot_laser(duration = 3):
-  print("LASER ON")
-  GPIO.output(laser_pin, GPIO.HIGH)
-  time.sleep(duration)
-  GPIO.output(laser_pin, GPIO.LOW)
-  print("LASER OFF")
-
+def shoot_laser_with_info(duration, target_name):
+    """Shoot laser with target information"""
+    print(f"   LASER ON - Targeting {target_name}")
+    GPIO.output(laser_pin, GPIO.HIGH)
+    time.sleep(duration)
+    GPIO.output(laser_pin, GPIO.LOW)
+    print(f"   LASER OFF - {target_name} targeted")
 
 
 #-----------------HTML Setup-----------------------------------
