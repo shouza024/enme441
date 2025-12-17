@@ -286,11 +286,10 @@ def initiate():
     """
     Main function to initiate turret operation:
     - Parses JSON for turret and globe positions
-    - Computes aiming angles
+    - Computes aiming angles relative to zeroed turret
     - Moves steppers for azimuth and altitude
     - Fires laser at each target
     """
-
     global turret, globe, r_position, theta_position, altitude_position
 
     print("Initiating turret run...")
@@ -307,20 +306,24 @@ def initiate():
     z_position = 3.0  # cm above ground
     altitude_position = 0.0
 
-    # Set mechanical zero
+    # Move steppers to mechanical zero
     p1 = m1.goAngle(0)  # azimuth
     p2 = m2.goAngle(0)  # altitude
     p1.join()
     p2.join()
 
+    # Record the zero offset
+    theta_zero = theta_position  # absolute JSON angle at zero
+    print(f"Mechanical zero set at turret theta = {theta_zero:.3f} rad")
+
     # Sort globes and turrets by theta
     globes_sorted = sorted(globe, key=lambda g: g[1])
     turrets_sorted = sorted(turret, key=lambda t: t[1])
 
-    # Find closest globe
+    # Find closest globe and sweep direction
     closest_globe_idx = min(range(len(globes_sorted)),
-                            key=lambda i: abs(angle_diff(globes_sorted[i][1], theta_position)))
-    direction = angle_diff(globes_sorted[closest_globe_idx][1], theta_position)
+                            key=lambda i: abs(angle_diff(globes_sorted[i][1], theta_zero)))
+    direction = angle_diff(globes_sorted[closest_globe_idx][1], theta_zero)
     sweep_direction = 1 if direction > 0 else -1
 
     # Build globe sweep sequence
@@ -343,7 +346,10 @@ def initiate():
 
     # ---- Sweep globes ----
     for i, g in enumerate(globe_sequence):
-        azimuth_angle, altitude_angle = go_next(g, [r_position, theta_position, z_position])
+        # Adjust target theta relative to mechanical zero
+        adjusted_theta = g[1] - theta_zero
+        azimuth_angle, altitude_angle = go_next([g[0], adjusted_theta, g[2]],
+                                                [r_position, 0.0, z_position])
         p1 = m1.goAngle(math.degrees(azimuth_angle))
         p2 = m2.goAngle(math.degrees(altitude_angle))
         p1.join()
@@ -354,9 +360,12 @@ def initiate():
 
     # ---- Sweep turrets ----
     for i, t in enumerate(turret_sequence):
-        if abs(angle_diff(theta_position, t[1])) < 1e-3:
+        # Skip if already at this position
+        if abs(angle_diff(theta_zero, t[1])) < 1e-3:
             continue
-        azimuth_angle, altitude_angle = go_next(t, [r_position, theta_position, z_position])
+        adjusted_theta = t[1] - theta_zero
+        azimuth_angle, altitude_angle = go_next([t[0], adjusted_theta, z_position],
+                                                [r_position, 0.0, z_position])
         p1 = m1.goAngle(math.degrees(azimuth_angle))
         p2 = m2.goAngle(math.degrees(altitude_angle))
         p1.join()
@@ -364,6 +373,7 @@ def initiate():
         print(f"Aiming for turret #{i} -> azimuth: {azimuth_angle:.3f} rad, altitude: {altitude_angle:.3f} rad")
         shoot_laser()
         time.sleep(5)
+
     
 
 def stopping():         #Stops any motion, honestly not sure how do this yet? Is this required?
