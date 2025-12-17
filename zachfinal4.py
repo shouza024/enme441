@@ -447,7 +447,7 @@ def initiate():
             
             # Shoot laser with target info
             print(f"   FIRING LASER at {target_info['display_name']}...")
-            shoot_laser_with_info(2, target_info['display_name'])
+            shoot_laser(2, target_info['display_name'])
             
             # Brief pause between targets
             if i < len(sequence) - 1:  # Not the last target
@@ -466,7 +466,7 @@ def initiate():
     p2.join()
     print("Back at center (azimuth=0°, altitude=0°)")
 
-def shoot_laser_with_info(duration, target_name):
+def shoot_laser(duration, target_name):
     """Shoot laser with target information"""
     print(f"   LASER ON - Targeting {target_name}")
     GPIO.output(laser_pin, GPIO.HIGH)
