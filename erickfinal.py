@@ -303,8 +303,6 @@ def initiate():         #This function will parse the json file initate calculat
     p1.join()
     p2.join()
     
-    theta_position = 0.0
-    atitude_position = 0.0
 
     # Sort globes and turrets by theta
     sort_globe = sorted(globe, key=lambda g: g[1])
@@ -346,44 +344,34 @@ def initiate():         #This function will parse the json file initate calculat
         turret_azimuth_angle, turret_altitude_angle = go_next(g, [r_position, theta_position, z_position])
 
         # --- Azimuth (relative) ---
-        p1 = m1.goAngle((theta_position + turret_azimuth_angle) * 180 / math.pi)
+        p1 = m1.goAngle((turret_azimuth_angle) * 180 / math.pi)
 
         # --- Altitude (ABSOLUTE) ---
-        altitude_position += turret_altitude_angle
-        p2 = m2.goAngle(altitude_position * 180 / math.pi)
+        p2 = m2.goAngle(turret_altitude_angle * 180 / math.pi)
 
         p1.join()
         p2.join()
-
-        theta_position = (theta_position + turret_azimuth_angle) % (2 * math.pi)
 
         print(f"aiming for globe#{i}")
         print(f"azimuth: {turret_azimuth_angle} rad")
         print(f"altitude: {turret_altitude_angle} rad")
         shoot_laser()
         time.sleep(5)
-    
-    print("Resetting altitude (pitch) back to zero before turret targeting...")
-    altitude_position =0.0
-    p2 = m2.goAngle(0)   # Move altitude axis (motor 2) back to level
-    p2.join()              # Re-zero altitude axis
-              # Restore your original turret height reference
+   
 
     for z, t_target in enumerate(turret_target_sequence):
         if abs(angle_diff(theta_position, t_target[1])) < 1e-3:
             continue
 
-        turret_azimuth_angle, turret_altitude_angle = go_next(t_target + [0], [r_position, theta_position, z_position])
+        turret_azimuth_angle, turret_altitude_angle = go_next(t_target, [r_position, theta_position, z_position])
 
-        p1 = m1.goAngle((theta_position + turret_azimuth_angle) * 180 / math.pi)
+        p1 = m1.goAngle((turret_azimuth_angle) * 180 / math.pi)
 
-        altitude_position += turret_altitude_angle
-        p2 = m2.goAngle(altitude_position * 180 / math.pi)
+        p2 = m2.goAngle(turret_altitude_angle * 180 / math.pi)
 
         p1.join()
         p2.join()
 
-        theta_position = (theta_position + turret_azimuth_angle) % (2 * math.pi)
 
         print(f"Aiming for turret#{z}: azimuth {turret_azimuth_angle:.3f} rad, altitude {turret_altitude_angle:.3f} rad")
         shoot_laser()
