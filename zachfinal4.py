@@ -189,7 +189,7 @@ def go_next(target_coordinates,turret_coordinates):
     else:
         # General case: (π - |Δθ|)/2
         azimuth = (math.pi - abs(dtheta)) / 2
-        azimuth *= -1 if dtheta >= 0 else 1
+        azimuth *= 1 if dtheta >= 0 else -1
     
     # Altitude
     chord_length = 2 * r_t * math.sin(abs(dtheta) / 2)
@@ -468,7 +468,7 @@ def initiate():
     p2.join()
     print("Back at center (azimuth=0°, altitude=0°)")
 
-def shoot_laser(duration=3, target_name=None):
+def shoot_laser(duration=4, target_name=None):
     """Shoot laser with optional target information"""
     if target_name:
         print(f"   LASER ON - Targeting {target_name}")
