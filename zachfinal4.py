@@ -244,7 +244,7 @@ def update(data_dict): # updates global variable base on what is found in the da
     # Manual Laser 
     if 'laser_on' in data_dict:
       print('Manual Laser ON')
-      shoot_laser(3)
+      shoot_laser(3, "Manual Control")  # Added target_name parameter
       return 
             
     if 'run_signal' in data_dict:
@@ -466,14 +466,21 @@ def initiate():
     p2.join()
     print("Back at center (azimuth=0°, altitude=0°)")
 
-def shoot_laser(duration, target_name):
-    """Shoot laser with target information"""
-    print(f"   LASER ON - Targeting {target_name}")
+def shoot_laser(duration=3, target_name=None):
+    """Shoot laser with optional target information"""
+    if target_name:
+        print(f"   LASER ON - Targeting {target_name}")
+    else:
+        print(f"   LASER ON")
+    
     GPIO.output(laser_pin, GPIO.HIGH)
     time.sleep(duration)
     GPIO.output(laser_pin, GPIO.LOW)
-    print(f"   LASER OFF - {target_name} targeted")
-
+    
+    if target_name:
+        print(f"   LASER OFF - {target_name} targeted")
+    else:
+        print(f"   LASER OFF")
 
 #-----------------HTML Setup-----------------------------------
 ##web page function-setups the page window for user to submit desired brightness level input
