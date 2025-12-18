@@ -32,143 +32,14 @@ lock = multiprocessing.Lock()
 m2 = Stepper(s, lock)   #will control azimuth
 m1 = Stepper(s, lock)   #will control altitude
 
-#------------------Server running with json file------------------------------
-
-data ={
-  "turrets": {
-    "1": {
-      "r": 182.8,
-      "theta": 5.25344104850293
-    },
-    "2": {
-      "r": 182.8,
-      "theta": 3.5081117965086
-    },
-    "3": {
-      "r": 182.8,
-      "theta": 1.91986217719376
-    },
-    "4": {
-      "r": 182.8,
-      "theta": 4.45058959258554
-    },
-    "5": {
-      "r": 182.8,
-      "theta": 0.436332312998582
-    },
-    "6": {
-      "r": 182.8,
-      "theta": 2.47836753783195
-    },
-    "7": {
-      "r": 182.8,
-      "theta": 1.62315620435473
-    },
-    "8": {
-      "r": 182.8,
-      "theta": 5.70722665402146
-    },
-    "9": {
-      "r": 182.8,
-      "theta": 4.1538836197465
-    },
-    "10": {
-      "r": 182.8,
-      "theta": 3.35103216382911
-    },
-    "11": {
-      "r": 182.8,
-      "theta": 4.71238898038469
-    },
-    "12": {
-      "r": 182.8,
-      "theta": 2.23402144255274
-    },
-    "13": {
-      "r": 182.8,
-      "theta": 2.96705972839036
-    },
-    "14": {
-      "r": 182.8,
-      "theta": 0.802851455917392
-    },
-    "15": {
-      "r": 182.8,
-      "theta": 1.23918376891597
-    },
-    "16": {
-      "r": 182.8,
-      "theta": 0.20943951023932
-    },
-    "17": {
-      "r": 182.8,
-      "theta": 4.88692190558412
-    },
-    "18": {
-      "r": 182.8,
-      "theta": 3.17649923862968
-    },
-    "19": {
-      "r": 182.8,
-      "theta": 3.99680398706701
-    },
-    "20": {
-      "r": 182.8,
-      "theta": 6.2482787221397
-    },
-    "21": {
-      "r": 182.8,
-      "theta": 2.80998009571087
-    },
-    "22": {
-      "r": 182.8,
-      "theta": 3.7873644768277
-    }
-  },
-  "globes": [
-    {
-      "r": 182.8,
-      "theta": 3.14,
-      "z": 162.6
-    },
-    {
-      "r": 182.8,
-      "theta": 1.047,
-      "z": 195.6
-    }
-  ]
-}
-
-json_data = json.dumps(data)
-def run_server():
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(("10.115.189.68", 4084))   ##10.115.189.68 Erick Ip   ## 127.0.1.1 Zach Ip address
-    server.listen(1)
-
-    print("waiting for connection json server")
-
-    conn, addr = server.accept()
-    print("client connected from", addr)
-
-    # Send the JSON to the client
-    response = "HTTP/1.1 200 OK\r\n" \
-               "Content-Type: application/json\r\n" \
-               "Content-Length: {}\r\n" \
-               "Connection: close\r\n\r\n{}".format(len(json_data), json_data)  
-    conn.sendall(response.encode("utf-8"))
-
-    conn.close()
-    server.close()
-
+#---------------------Helper/Math Functions---------------
 def angle_diff(target_rad, current_rad):
     diff = (target_rad - current_rad + math.pi) % (2 * math.pi) - math.pi
     return diff
 
 def turret_altitude(target_coord,turret_coord):
-    """
-    turret, target: [r, theta, z] in radians and same radius
-    Returns signed pitch rotation (rad) to aim at target
-    """
+    #turret, target: [r, theta, z] in radians and same radius
+    #Returns signed pitch rotation (rad) to aim at target
     r_t, theta_t, z_t = turret_coord
     r_p, theta_p, z_p = target_coord
     
@@ -184,34 +55,8 @@ def turret_altitude(target_coord,turret_coord):
     return (altitude)
 
 def go_next(target_coordinates,turret_coordinates):
-        #target_coordinates - list contain [radians, theta, zeta]
-        #turret_coordinates - list contains [radians, theta, zeta] zeta might be decide by our cad model, when we get around to that
-    '''
-    r_t, theta_t, z_t = turret_coordinates
-    r_p, theta_p, z_p = target_coordinates
-
-    # Angular difference from turret → target (signed, shortest path)
-    dtheta = angle_diff(theta_p, theta_t)
-
-    # Magnitude of that difference (for isosceles geometry)
-    abs_dtheta = abs(dtheta)
-
-    # If turrets all lie on same radius R:
-    # Required azimuth rotation = (π - |Δθ|)/2
-    turret_azimuth_angle = (math.pi - abs_dtheta) / 2
-
-    # Direction: same sign as dtheta
-    turret_azimuth_angle *= -1 if dtheta > 0 else 1
-
-    # Altitude stays same (your existing code)
-    turret_altitude_angle = turret_altitude(target_coordinates, turret_coordinates)
-    '''
-    """
-    Returns signed azimuth and altitude rotation for turret to aim at target.
-    target_coordinates: [r, theta, z]
-    turret_coordinates: [r, theta, z]
-    All angles in radians, r in cm
-    """
+    #target_coordinates - list contain [radians, theta, zeta]
+    #turret_coordinates - list contains [radians, theta, zeta] zeta might be decide by our cad model, when we get around to that
     r_t, theta_t, z_t = turret_coordinates
     r_p, theta_p, z_p = target_coordinates
 
@@ -233,16 +78,15 @@ def go_next(target_coordinates,turret_coordinates):
     turret_altitude_angle = math.atan2(dz, chord_length)
 
     return [turret_azimuth_angle, turret_altitude_angle]
-    #return [turret_azimuth_angle, turret_altitude_angle]
 
 #-------------------Parsing Json-------------------------------
-url = "http://10.115.189.68:4084" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
-    #"http://192.168.1.254:8000/positions.json"
+url = "http://192.168.1.254:8000/positions.json" #INSERT URL WHEN RELEASED 
+    #"http://192.168.1.254:8000/positions.json" in case we forget
 def parse_json():
     
     response = requests.get(url)
     response.raise_for_status() 
-    data = response.json()#utf8
+    data = response.json()
     print("json filed parsed and copied")
     '''
     #This code parse the example.json file, only use while in testing
@@ -660,13 +504,6 @@ d.listen(3)
 
 web_page_thread = threading.Thread(target=server_web_page)
 web_page_thread.daemon = True
-
-
-#_______________________DELETE WHEN DEVIO SERVER UP
-
-server_thread = threading.Thread(target=run_server)
-server_thread.daemon = True
-server_thread.start()
 
 
 web_page_thread.start()
