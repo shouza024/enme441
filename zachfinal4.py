@@ -32,9 +32,6 @@ lock = multiprocessing.Lock()
 m2 = Stepper(s, lock)   #will control azimuth
 m1 = Stepper(s, lock)   #will control altitude
 
-<<<<<<< HEAD
-#---------------------Helper/Math Functions---------------
-=======
 #------------------Server running with json file------------------------------
 
 data ={
@@ -163,66 +160,67 @@ def run_server():
     conn.close()
     server.close()
 
->>>>>>> ea57b97c091d0df2be2ab8294255c2acf7463890
 def angle_diff(target_rad, current_rad):
     diff = (target_rad - current_rad + math.pi) % (2 * math.pi) - math.pi
     return diff
 
-def turret_altitude(target_coord,turret_coord):
-    #turret, target: [r, theta, z] in radians and same radius
-    #Returns signed pitch rotation (rad) to aim at target
-    r_t, theta_t, z_t = turret_coord
-    r_p, theta_p, z_p = target_coord
-    
-    # horizontal distance
-    delta_theta = angle_diff(theta_p, theta_t)
-    dh = 2*r_t*math.sin(abs(delta_theta)/2)
-    
-    # vertical difference
-    dz = (z_p - z_t)
-    
-    # signed pitch angle
-    altitude = math.atan2(dz, dh)
-    return (altitude)
 
 def go_next(target_coordinates,turret_coordinates):
-    #target_coordinates - list contain [radians, theta, zeta]
-    #turret_coordinates - list contains [radians, theta, zeta] zeta might be decide by our cad model, when we get around to that
+    """
+    Fixed version with edge case handling.
+    """
     r_t, theta_t, z_t = turret_coordinates
     r_p, theta_p, z_p = target_coordinates
-
-    # Angular difference between turret and target
-    r_t, theta_t, z_t = turret_coordinates
-    r_p, theta_p, z_p = target_coordinates
-
-    # --- Azimuth: shortest rotation along the circle ---
-    # signed difference in radians (-pi, pi)
+    
+    # Angular difference
     dtheta = angle_diff(theta_p, theta_t)
-    turret_azimuth_angle = dtheta  # move exactly this amount
-
-    # --- Horizontal chord length for altitude ---
+    
+    # Special case: target very close to us
+    if abs(dtheta) < 0.001:  # ~0.057°
+        # Target is essentially at our position
+        # We could aim slightly to the side or skip
+        return [0, 0]
+    
+    # Special case: target almost opposite (Δθ ≈ π)
+    if abs(abs(dtheta) - math.pi) < 0.001:
+        # Target opposite us, aim 90° from inward
+        azimuth = math.pi/2
+        azimuth *= -1 if dtheta >= 0 else 1
+    else:
+        # General case: (π - |Δθ|)/2
+        azimuth = (math.pi - abs(dtheta)) / 2
+        azimuth *= -1 if dtheta >= 0 else 1
+    
+    # Altitude
     chord_length = 2 * r_t * math.sin(abs(dtheta) / 2)
-    chord_length = max(chord_length, 1e-6)
-
-    # --- Altitude (pitch) angle ---
     dz = z_p - z_t
-    turret_altitude_angle = math.atan2(dz, chord_length)
-
-    return [turret_azimuth_angle, turret_altitude_angle]
-
-#-------------------Parsing Json-------------------------------
-<<<<<<< HEAD
-url = "http://192.168.1.254:8000/positions.json" #INSERT URL WHEN RELEASED 
-    #"http://192.168.1.254:8000/positions.json" in case we forget
-=======
-url = "http://127.0.1.1:4084" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
+    
+    altitude = -math.atan2(dz, chord_length)
+    
+    return [azimuth, altitude]
+def aim_at_center(turret_coordinates):
+    """
+    Calculate angles to aim at center when zero already points to center.
+    This should return [0, something] since we're already pointing at center!
+    """
+    r_t, theta_t, z_t = turret_coordinates
+    
+    # If azimuth=0 points to center, then to aim at center:
+    azimuth = 0.0
+    
+    # Altitude depends on height difference
+    # Assuming center is at z=0
+    altitude = math.atan2(-z_t, r_t)  # Negative because center is lower if we're above it
+    
+    return [azimuth, altitude]
+#-------------------Parsing -------------------------------
+url = "http://192.168.1.254:8000/positions.json" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
     #"http://192.168.1.254:8000/positions.json"
->>>>>>> ea57b97c091d0df2be2ab8294255c2acf7463890
 def parse_json():
     
     response = requests.get(url)
     response.raise_for_status() 
-    data = response.json()
+    data = response.json()#utf8
     print("json filed parsed and copied")
     '''
     #This code parse the example.json file, only use while in testing
@@ -238,15 +236,260 @@ def parse_json():
     #turret[id][r,theta] 
     #globe[id][r,theta,z] How to find any values from the json file
     #print(turret[1][1]) #Print turret radius of turret id 1.
+def set_zero(azimuth, altitude):
+    print(f'moving to new desired zero: azimuth={azimuth}°, altitude={altitude}°')
+    global m1, m2
+    
+    # Move both axes simultaneously
+    p1 = m1.goAngle(azimuth)
+    p2 = m2.goAngle(altitude)
+    
+    # Wait for both to complete
+    p1.join()
+    p2.join()
+    
+    # Reset the stepper angle tracking to zero at current position
+    m1.zero()
+    m2.zero()
+    
+    print(f'Zero position set: azimuth={azimuth}°, altitude={altitude}°')
+
+def stopping():         
+    print('stopping')
+    # Add any emergency stop logic here if needed
+    # For example: stop any ongoing movements
 
 #-----------------Control function Base on the data_dict read into Pi-----------------------------
+
+ 
+def create_optimal_sequence(my_theta, targets):
+    """
+    Create optimal sequence to minimize total movement.
+    
+    Args:
+        my_theta: Our current azimuth angle (radians)
+        targets: List of [r, theta, z] for each target
+        
+    Returns:
+        Sorted list of targets in optimal order
+    """
+    # Calculate angular distance from our position
+    targets_with_dist = []
+    for target in targets:
+        dtheta = angle_diff(target[1], my_theta)
+        targets_with_dist.append((target, dtheta))
+    
+    # Sort by angular distance (absolute value)
+    targets_with_dist.sort(key=lambda x: abs(x[1]))
+    
+    # Now we have closest first, farthest last
+    # But we can optimize further...
+    
+    # Actually, simplest: sort by theta in increasing order
+    # This gives a natural sweep around the circle
+    sorted_by_theta = sorted(targets, key=lambda t: t[1])
+    
+    # Find where we are in this sequence
+    # Place targets so we start with closest and go around
+    idx = 0
+    min_dist = float('inf')
+    for i, target in enumerate(sorted_by_theta):
+        dist = abs(angle_diff(target[1], my_theta))
+        if dist < min_dist:
+            min_dist = dist
+            idx = i
+    
+    # Create sequence starting from closest
+    optimal_sequence = sorted_by_theta[idx:] + sorted_by_theta[:idx]
+    
+    return optimal_sequence      
+def initiate():
+    """FAST version - no return to center between targets"""
+    print("FAST initiate run")
+    
+    # Fetch data
+    response = requests.get(url)
+    current_data = response.json()
+    
+    # Your position
+    my_turret_id = "20"
+    r_position = current_data['turrets'][my_turret_id]['r']
+    theta_position = current_data['turrets'][my_turret_id]['theta']
+    z_position = 0
+    
+    # Create a mapping of turret IDs to their indices for reference
+    turret_id_to_data = {}
+    for tid, tdata in current_data['turrets'].items():
+        turret_id_to_data[tid] = tdata
+    
+    # Collect all targets with metadata
+    all_targets = []
+    
+    # Globes
+    for i, g in enumerate(current_data['globes']):
+        all_targets.append({
+            'type': 'globe',
+            'id': f"globe_{i+1}",
+            'display_name': f"Globe {i+1}",
+            'r': g['r'],
+            'theta': g['theta'],
+            'z': g['z'],
+            'data': g
+        })
+    
+    # Other turrets
+    for tid, tdata in current_data['turrets'].items():
+        if tid != my_turret_id:
+            # Find turret's display number
+            turret_num = int(tid) if tid.isdigit() else 0
+            all_targets.append({
+                'type': 'turret',
+                'id': tid,
+                'display_name': f"Turret #{tid}",
+                'r': tdata['r'],
+                'theta': tdata['theta'],
+                'z': z_position,
+                'data': tdata
+            })
+    
+    # Create optimal sequence
+    sequence_targets = [t for t in all_targets]  # Make a copy
+    sequence = create_optimal_sequence(theta_position, [
+        [t['r'], t['theta'], t['z']] for t in sequence_targets
+    ])
+    
+    # Create mapping from coordinates back to target info
+    coord_to_target = {}
+    for target_info in sequence_targets:
+        coord_key = (target_info['r'], target_info['theta'], target_info['z'])
+        coord_to_target[coord_key] = target_info
+    
+    print(f"Found {len(sequence)} targets")
+    print("=" * 50)
+    
+    # Display all targets in sequence order
+    print("\nTARGET SEQUENCE:")
+    for i, coords in enumerate(sequence):
+        target_info = coord_to_target.get((coords[0], coords[1], coords[2]))
+        if target_info:
+            deg = coords[1] * 180 / math.pi
+            print(f"{i+1:2d}. {target_info['display_name']:15s} θ = {deg:6.1f}°")
+    
+    print("=" * 50)
+    
+    # Start from current position (assume we're at center)
+    current_azimuth = 0.0  # Currently aiming at center
+    current_altitude = math.atan2(-z_position, r_position)  # Angle to center
+    
+    # Calculate our position in degrees for display
+    our_theta_deg = theta_position * 180 / math.pi
+    print(f"\nOur position: Turret #{my_turret_id} at θ = {our_theta_deg:.1f}°")
+    print(f"Starting from center (azimuth=0°, altitude={current_altitude*180/math.pi:.1f}°)")
+    
+    # Move to first target from center
+    if sequence:
+        print("\n" + "=" * 50)
+        
+        for i, coords in enumerate(sequence):
+            # Get target info
+            target_info = coord_to_target.get((coords[0], coords[1], coords[2]))
+            
+            if not target_info:
+                print(f"\nERROR: Could not find target info for coordinates {coords}")
+                continue
+            
+            print(f"\n[{i+1}/{len(sequence)}] AIMING AT: {target_info['display_name']}")
+            print(f"   Type: {target_info['type'].upper()}")
+            
+            # Calculate position info
+            target_theta_deg = coords[1] * 180 / math.pi
+            angular_separation = angle_diff(coords[1], theta_position) * 180 / math.pi
+            
+            print(f"   Target θ: {target_theta_deg:.1f}°")
+            print(f"   Angular separation from us: {abs(angular_separation):.1f}°")
+            
+            if target_info['type'] == 'globe':
+                print(f"   Height (z): {coords[2]} cm")
+            
+            # Calculate aiming angles
+            azimuth, altitude = go_next(coords, [r_position, theta_position, z_position])
+            
+            # Convert to degrees
+            azimuth_deg = azimuth * 180 / math.pi
+            altitude_deg = altitude * 180 / math.pi
+            
+            print(f"   Required azimuth: {azimuth_deg:6.1f}°")
+            print(f"   Required altitude: {altitude_deg:6.1f}°")
+            
+            if i == 0:
+                # First target: move directly from center
+                print(f"   Moving from center to target...")
+                p1 = m1.goAngle(azimuth_deg)
+                p2 = m2.goAngle(altitude_deg)
+            else:
+                # Subsequent targets: move relative to current position
+                delta_azimuth = azimuth - current_azimuth
+                delta_altitude = altitude - current_altitude
+                delta_azimuth_deg = delta_azimuth * 180 / math.pi
+                delta_altitude_deg = delta_altitude * 180 / math.pi
+                
+                print(f"   ΔAzimuth from previous: {delta_azimuth_deg:6.1f}°")
+                print(f"   ΔAltitude from previous: {delta_altitude_deg:6.1f}°")
+                
+                p1 = m1.rotate(delta_azimuth_deg)
+                p2 = m2.rotate(delta_altitude_deg)
+            
+            # Wait for movements to complete
+            p1.join()
+            p2.join()
+            
+            # Update current position
+            current_azimuth = azimuth
+            current_altitude = altitude
+            
+            # Shoot laser with target info
+            print(f"   FIRING LASER at {target_info['display_name']}...")
+            shoot_laser(2, target_info['display_name'])
+            
+            # Brief pause between targets
+            if i < len(sequence) - 1:  # Not the last target
+                print(f"   Preparing for next target...")
+                time.sleep(0.5)
+    
+    print("\n" + "=" * 50)
+    print("SEQUENCE COMPLETE!")
+    print(f"Successfully aimed at {len(sequence)} targets")
+    
+    # Return to center at the end
+    print("\nReturning to center position...")
+    p1 = m1.goAngle(0)
+    p2 = m2.goAngle(0)
+    p1.join()
+    p2.join()
+    print("Back at center (azimuth=0°, altitude=0°)")
+
+def shoot_laser(duration=4, target_name=None):
+    """Shoot laser with optional target information"""
+    if target_name:
+        print(f"   LASER ON - Targeting {target_name}")
+    else:
+        print(f"   LASER ON")
+    
+    GPIO.output(laser_pin, GPIO.HIGH)
+    time.sleep(duration)
+    GPIO.output(laser_pin, GPIO.LOW)
+    
+    if target_name:
+        print(f"   LASER OFF - {target_name} targeted")
+    else:
+        print(f"   LASER OFF")
 def update(data_dict): # updates global variable base on what is found in the data_dict
     global run_signal, stop_signal,azimuth_input, altitude_input
 
     # Manual Laser 
     if 'laser_on' in data_dict:
       print('Manual Laser ON')
-      shoot_laser(3)
+      shoot_laser(3, "Manual Control")  # Added target_name parameter
       return 
             
     if 'run_signal' in data_dict:
@@ -261,129 +504,6 @@ def update(data_dict): # updates global variable base on what is found in the da
         azimuth_input = float(data_dict['azimuth'])
         altitude_input= float(data_dict['altitude'])
         set_zero(azimuth_input,altitude_input)
- 
-      
-def initiate():
-    """
-    Main function to initiate turret operation:
-    - Parses JSON for turret and globe positions
-    - Computes aiming angles relative to zeroed turret
-    - Moves steppers for azimuth and altitude
-    - Fires laser at each target
-    """
-    global turret, globe, r_position, theta_position, altitude_position
-
-    print("Initiating turret run...")
-
-    # Parse JSON data from server
-    parse_json()
-    print("Turrets:", turret)
-    print("Globes:", globe)
-
-    # Starting turret position
-    my_turret_id = "20"
-    r_position = data['turrets'][my_turret_id]['r']
-    theta_position = data['turrets'][my_turret_id]['theta']
-    z_position = 3.0  # cm above ground
-    altitude_position = 0.0
-
-    # Move steppers to mechanical zero
-    p1 = m1.goAngle(0)  # azimuth
-    p2 = m2.goAngle(0)  # altitude
-    p1.join()
-    p2.join()
-
-    # Record the zero offset
-    theta_zero = theta_position  # absolute JSON angle at zero
-    print(f"Mechanical zero set at turret theta = {theta_zero:.3f} rad")
-
-    # Sort globes and turrets by theta
-    globes_sorted = sorted(globe, key=lambda g: g[1])
-    turrets_sorted = sorted(turret, key=lambda t: t[1])
-
-    # Find closest globe and sweep direction
-    closest_globe_idx = min(range(len(globes_sorted)),
-                            key=lambda i: abs(angle_diff(globes_sorted[i][1], theta_zero)))
-    direction = angle_diff(globes_sorted[closest_globe_idx][1], theta_zero)
-    sweep_direction = 1 if direction > 0 else -1
-
-    # Build globe sweep sequence
-    if sweep_direction == 1:
-        globe_sequence = globes_sorted[closest_globe_idx:] + globes_sorted[:closest_globe_idx]
-    else:
-        rev = globes_sorted[::-1]
-        idx = rev.index(globes_sorted[closest_globe_idx])
-        globe_sequence = rev[idx:] + rev[:idx]
-
-    # Build turret sweep sequence
-    last_globe_theta = globe_sequence[-1][1]
-    if sweep_direction == 1:
-        turret_order = turrets_sorted[::-1]
-    else:
-        turret_order = turrets_sorted
-    start_idx = min(range(len(turret_order)),
-                    key=lambda i: abs(angle_diff(turret_order[i][1], last_globe_theta)))
-    turret_sequence = turret_order[start_idx:] + turret_order[:start_idx]
-
-    # ---- Sweep globes ----
-    for i, g in enumerate(globe_sequence):
-        # Adjust target theta relative to mechanical zero
-        azimuth_angle, altitude_angle = go_next(
-            [g[0], g[1], g[2]],                  # absolute globe angle
-            [r_position, theta_zero, z_position] # absolute turret angle
-        )
-        p1 = m1.goAngle(math.degrees(azimuth_angle))
-        p2 = m2.goAngle(math.degrees(altitude_angle))
-        p1.join()
-        p2.join()
-        print(f"Aiming for globe #{i} -> azimuth: {azimuth_angle:.3f} rad, altitude: {altitude_angle:.3f} rad")
-        shoot_laser()
-        time.sleep(5)
-
-    # ---- Sweep turrets ----
-    for i, t in enumerate(turret_sequence):
-        # Skip if already at this position
-        if abs(angle_diff(theta_zero, t[1])) < 1e-3:
-            continue
-        
-        azimuth_angle, altitude_angle = go_next([t[0], t[1], z_position],
-                                                [r_position, 0.0, 5])
-        p1 = m1.goAngle(math.degrees(azimuth_angle))
-        p2 = m2.goAngle(math.degrees(altitude_angle))
-        p1.join()
-        p2.join()
-        print(f"Aiming for turret #{i} -> azimuth: {azimuth_angle:.3f} rad, altitude: {altitude_angle:.3f} rad")
-        shoot_laser()
-        time.sleep(5)
-
-    
-
-def stopping():         #Stops any motion, honestly not sure how do this yet? Is this required?
-    print('stoping')
-
-    
-
-def set_zero(azimuth,altitude):
-    print('moving to new desire zero')
-    global m1,m2
-    p2 = m2.goAngle(azimuth)
-    p1 = m1.goAngle(altitude)
-    p1.join()
-    print(f'moving m1 to {altitude}')
-    print(f"moving m2 to {azimuth}")
-    p2.join()
-    m1.zero()
-    m2.zero()
-
-def shoot_laser(duration = 3):
-  print("LASER ON")
-  GPIO.output(laser_pin, GPIO.HIGH)
-  time.sleep(duration)
-  GPIO.output(laser_pin, GPIO.LOW)
-  print("LASER OFF")
-
-
-
 #-----------------HTML Setup-----------------------------------
 ##web page function-setups the page window for user to submit desired brightness level input
 def web_page():
@@ -641,6 +761,13 @@ d.listen(3)
 web_page_thread = threading.Thread(target=server_web_page)
 web_page_thread.daemon = True
 
+
+#_______________________DELETE WHEN DEVIO SERVER UP
+'''
+server_thread = threading.Thread(target=run_server)
+server_thread.daemon = True
+server_thread.start()
+'''
 
 web_page_thread.start()
 time.sleep(1)
