@@ -80,13 +80,8 @@ def go_next(target_coordinates,turret_coordinates):
     return [turret_azimuth_angle, turret_altitude_angle]
 
 #-------------------Parsing Json-------------------------------
-<<<<<<< HEAD
 url = "http://192.168.1.254:8000/positions.json" #INSERT URL WHEN RELEASED 
     #"http://192.168.1.254:8000/positions.json" in case we forget
-=======
-url = "http://127.0.1.1:4084" #INSERT URL WHEN RELEASED "http://10.112.150.68:4084"
-    #"http://192.168.1.254:8000/positions.json"
->>>>>>> ea57b97c091d0df2be2ab8294255c2acf7463890
 def parse_json():
     
     response = requests.get(url)
@@ -133,13 +128,6 @@ def update(data_dict): # updates global variable base on what is found in the da
  
       
 def initiate():
-    """
-    Main function to initiate turret operation:
-    - Parses JSON for turret and globe positions
-    - Computes aiming angles relative to zeroed turret
-    - Moves steppers for azimuth and altitude
-    - Fires laser at each target
-    """
     global turret, globe, r_position, theta_position, altitude_position
 
     print("Initiating turret run...")
@@ -150,9 +138,8 @@ def initiate():
     print("Globes:", globe)
 
     # Starting turret position
-    my_turret_id = "20"
-    r_position = data['turrets'][my_turret_id]['r']
-    theta_position = data['turrets'][my_turret_id]['theta']
+    my_turret_id = 20
+    r_position,theta_position = turret[my_turret_id-1]
     z_position = 3.0  # cm above ground
     altitude_position = 0.0
 
@@ -163,16 +150,14 @@ def initiate():
     p2.join()
 
     # Record the zero offset
-    theta_zero = theta_position  # absolute JSON angle at zero
-    print(f"Mechanical zero set at turret theta = {theta_zero:.3f} rad")
+    theta_zero = theta_position
 
     # Sort globes and turrets by theta
     globes_sorted = sorted(globe, key=lambda g: g[1])
     turrets_sorted = sorted(turret, key=lambda t: t[1])
 
     # Find closest globe and sweep direction
-    closest_globe_idx = min(range(len(globes_sorted)),
-                            key=lambda i: abs(angle_diff(globes_sorted[i][1], theta_zero)))
+    closest_globe_idx = min(range(len(globes_sorted)),key=lambda i: abs(angle_diff(globes_sorted[i][1], theta_zero)))
     direction = angle_diff(globes_sorted[closest_globe_idx][1], theta_zero)
     sweep_direction = 1 if direction > 0 else -1
 
@@ -190,16 +175,15 @@ def initiate():
         turret_order = turrets_sorted[::-1]
     else:
         turret_order = turrets_sorted
-    start_idx = min(range(len(turret_order)),
-                    key=lambda i: abs(angle_diff(turret_order[i][1], last_globe_theta)))
+    start_idx = min(range(len(turret_order)),key=lambda i: abs(angle_diff(turret_order[i][1], last_globe_theta)))
     turret_sequence = turret_order[start_idx:] + turret_order[:start_idx]
 
-    # ---- Sweep globes ----
+    # --------- Sweep globes -------
     for i, g in enumerate(globe_sequence):
-        # Adjust target theta relative to mechanical zero
+        
         azimuth_angle, altitude_angle = go_next(
-            [g[0], g[1], g[2]],                  # absolute globe angle
-            [r_position, theta_zero, z_position] # absolute turret angle
+            [g[0], g[1], g[2]],                  
+            [r_position, theta_zero, z_position] 
         )
         p1 = m1.goAngle(math.degrees(azimuth_angle))
         p2 = m2.goAngle(math.degrees(altitude_angle))
@@ -209,9 +193,8 @@ def initiate():
         shoot_laser()
         time.sleep(5)
 
-    # ---- Sweep turrets ----
+    # ----------- Sweep turrets ----
     for i, t in enumerate(turret_sequence):
-        # Skip if already at this position
         if abs(angle_diff(theta_zero, t[1])) < 1e-3:
             continue
         
